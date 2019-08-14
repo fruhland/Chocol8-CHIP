@@ -20,7 +20,7 @@ public abstract class Graphics {
             byte currentLine = memory.getByte(address + i);
 
             for(int j = 0; j < 8; j++) {
-                if((currentLine & (1 << j)) > 0) {
+                if((currentLine & (1 << (7 - j))) > 0) {
                     if(flipPixel(x + j, y + i)) {
                         flippedFromSetToUnset = true;
                     }

@@ -11,7 +11,7 @@ class GraphicsPanel extends JPanel {
 
     private final boolean[] frameBuffer;
 
-    private int scaleFactor = 4;
+    private int scaleFactor = 8;
 
     public GraphicsPanel(final int resolutionX, final int resolutionY) {
         this.resolutionX = resolutionX;
@@ -25,7 +25,6 @@ class GraphicsPanel extends JPanel {
         }
 
         this.scaleFactor = scaleFactor;
-
         repaint();
     }
 
@@ -36,6 +35,7 @@ class GraphicsPanel extends JPanel {
 
     void reset() {
         Arrays.fill(frameBuffer, false);
+        repaint();
     }
 
     @Override
