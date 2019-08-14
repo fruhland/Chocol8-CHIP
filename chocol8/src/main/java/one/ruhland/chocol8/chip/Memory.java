@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 public class Memory {
 
-    static final int MEMORY_SIZE = 0xffff;
+    static final int MEMORY_SIZE = 0x0fff;
     static final int PROGRAM_START = 0x0200;
 
     private byte[] memory = new byte[MEMORY_SIZE];
