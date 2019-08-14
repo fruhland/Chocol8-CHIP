@@ -27,11 +27,20 @@ public class Cpu {
         executeOpcode(opcode);
     }
 
-    private void executeOpcode(final short opcode) {
-        byte operation = (byte) (opcode & 0xf000);
+    private void incProgramCounter() {
+        programCounter += 2;
+    }
 
-        switch (operation) {
+    private void executeOpcode(final short opcode) {
+        byte firstNibble = (byte) (opcode & 0xf000);
+
+        switch (firstNibble) {
             case 0x0:
+                if((opcode & 0x0fff) == 0x00e0) {
+                    graphics.reset();
+                    incProgramCounter();
+                    break;
+                }
             case 0x1:
             case 0x2:
             case 0x3:
@@ -45,6 +54,15 @@ public class Cpu {
             case 0xb:
             case 0xc:
             case 0xd:
+                short x = vRegisters[opcode & 0x0f00];
+                short y = vRegisters[opcode & 0x00f0];
+                short height = vRegisters[opcode & 0x000f];
+
+                if(graphics.drawSprite(x, y, height, indexRegister)) {
+                    vRegisters[0xf] = 1;
+                }
+                incProgramCounter();
+                break;
             case 0xe:
             case 0xf:
             default:

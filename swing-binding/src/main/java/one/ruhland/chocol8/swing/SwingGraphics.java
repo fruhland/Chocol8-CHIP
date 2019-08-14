@@ -65,8 +65,8 @@ public class SwingGraphics extends Graphics {
     }
 
     @Override
-    protected void flipPixel(int x, int y) {
-        panel.flipPixel(x, y);
+    protected boolean flipPixel(int x, int y) {
+        return panel.flipPixel(x, y);
     }
 
     @Override

@@ -13,18 +13,23 @@ public abstract class Graphics {
         this.memory = memory;
     }
 
-    void drawSprite(final int x, final int y, final int height, final int address) {
+    boolean drawSprite(final int x, final int y, final int height, final int address) {
+        boolean flippedFromSetToUnset = false;
+
         for(int i = 0; i < height; i++) {
             byte currentLine = memory.getByte(address + i);
 
             for(int j = 0; j < 8; j++) {
                 if((currentLine & (1 << j)) > 0) {
-                    flipPixel(x + j, y + i);
+                    if(flipPixel(x + j, y + i)) {
+                        flippedFromSetToUnset = true;
+                    }
                 }
             }
         }
 
         flush();
+        return flippedFromSetToUnset;
     }
 
     protected int getResolutionX() {
@@ -35,7 +40,7 @@ public abstract class Graphics {
         return resolutionY;
     }
 
-    protected abstract void flipPixel(int x, int y);
+    protected abstract boolean flipPixel(int x, int y);
 
     protected abstract void reset();
 

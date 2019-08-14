@@ -29,8 +29,9 @@ class GraphicsPanel extends JPanel {
         repaint();
     }
 
-    void flipPixel(int x, int y) {
+    boolean flipPixel(int x, int y) {
         frameBuffer[x + y * resolutionX] = !frameBuffer[x + y * resolutionX];
+        return !frameBuffer[x + y * resolutionX];
     }
 
     void reset() {
