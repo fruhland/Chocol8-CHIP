@@ -1,0 +1,20 @@
+plugins {
+    id 'java-library'
+}
+
+group 'one.ruhland'
+version = getProperty('projectVersion')
+
+compileJava {
+    sourceCompatibility = '11'
+    targetCompatibility = '11'
+    options.encoding = 'UTF-8'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation project(':chocol8')
+}

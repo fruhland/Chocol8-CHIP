@@ -1,0 +1,26 @@
+plugins {
+    id 'application'
+}
+
+group 'one.ruhland'
+version = getProperty('projectVersion')
+
+mainClassName = 'one.ruhland.chocol8.application.Application'
+applicationName = 'chocol8'
+
+compileJava {
+    sourceCompatibility = '11'
+    targetCompatibility = '11'
+    options.encoding = 'UTF-8'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation project(':chocol8')
+    implementation project(':swing-binding')
+
+    implementation 'info.picocli:picocli:3.9.6'
+}

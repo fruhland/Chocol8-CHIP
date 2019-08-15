@@ -1,0 +1,21 @@
+ext {
+    projectVersion = '0.1.0'
+}
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+}
+
+subprojects {
+    buildDir = rootProject.file("build/${it.name}")
+
+    repositories {
+        mavenCentral()
+    }
+}
+
+wrapper {
+    gradleVersion = "5.4.1"
+}
