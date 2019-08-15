@@ -24,16 +24,8 @@ public class Cpu {
     }
 
     public void runCycle() {
-        // Some test instructions, that should draw the fontset
-        for(byte i = 0; i <= 0xf; i++) {
-            executeOpcode((short) (0x6000 | ((i % 4) * 5)));
-            executeOpcode((short) (0x6100 | ((i / 4) * 6)));
-            executeOpcode((short) (0x6200 | i));
-            executeOpcode((short) 0xf229);
-            executeOpcode((short) 0xd015);
-        }
-
-        short opcode = (short) (memory.getByte(programCounter) << 8 | memory.getByte(programCounter + 1));
+        short opcode = (short) unsignedOperation(memory.getByte(programCounter), memory.getByte(programCounter + 1),
+                (operand1, operand2) -> operand1 << 8 | operand2);
         executeOpcode(opcode);
     }
 
@@ -119,7 +111,8 @@ public class Cpu {
                 break;
             case 0x7:
                 // 0x7XNN: V[X] += NN
-                vRegisters[(opcode & 0x0f00) >> 8] += (byte) (opcode & 0x00ff);
+                vRegisters[(opcode & 0x0f00) >> 8] = (byte) unsignedOperation(
+                        vRegisters[(opcode & 0x0f00) >> 8], (byte) (opcode & 0x00ff), Integer::sum);
                 incProgramCounter();
                 break;
             case 0x8:
@@ -204,6 +197,7 @@ public class Cpu {
                 // 0xaNNN: index = NNN
                 indexRegister = (short) (opcode & 0x0fff);
                 incProgramCounter();
+                break;
             case 0xb: {
                 // 0xBNNN: Jump to V[0] + NNN
                 jumpToAddress((short) ((opcode & 0x0fff) + vRegisters[0]));
