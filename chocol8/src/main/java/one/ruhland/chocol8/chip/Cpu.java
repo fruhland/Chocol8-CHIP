@@ -2,7 +2,6 @@ package one.ruhland.chocol8.chip;
 
 import java.util.Arrays;
 import java.util.function.BiFunction;
-import java.util.function.BinaryOperator;
 
 public class Cpu {
 
@@ -58,13 +57,21 @@ public class Cpu {
         }
     }
 
+    private int unsignedOperation(byte operand1, byte operand2, BiFunction<Integer, Integer, Integer> operator) {
+        return operator.apply(operand1 & 0xff, operand2 & 0xff);
+    }
+
+    private int byteToUnsignedInt(byte value) {
+        return value & 0xff;
+    }
+
     private void executeOpcode(final short opcode) {
         byte instruction = (byte) ((opcode & 0xf000) >> 12);
 
         switch (instruction) {
             case 0x0: {
                 // 0x00e0: Clear screen
-                if ((opcode & 0x0fff) == 0x00e0) {
+                if ((opcode & 0x0fff) == 0x0e0) {
                     graphics.reset();
                     incProgramCounter();
                     break;
@@ -91,7 +98,7 @@ public class Cpu {
             }
             case 0x5: {
                 // 0x5XY0: Skip next instruction if V[X] == V[Y]
-                if((opcode & 0x000f) == 0) {
+                if((opcode & 0x000f) == 0x0) {
                     conditionalJump(vRegisters[(opcode & 0x0f00) >> 8], vRegisters[(opcode & 0x00f0) >> 4], Byte::equals);
                     incProgramCounter();
                     break;
@@ -110,9 +117,74 @@ public class Cpu {
                 incProgramCounter();
                 break;
             case 0x8:
+                // 0x8XY1: V[X] |= V[Y]
+                if((opcode & 0x000f) == 0x1) {
+                    vRegisters[(opcode & 0x0f00) >> 8] |= vRegisters[(opcode & 0x00f0) >> 4];
+                    incProgramCounter();
+                    break;
+                }
+                // 0x8XY2: V[X] &= V[Y]
+                else if((opcode & 0x000f) == 0x2) {
+                    vRegisters[(opcode & 0x0f00) >> 8] &= vRegisters[(opcode & 0x00f0) >> 4];
+                    incProgramCounter();
+                    break;
+                }
+                // 0x8XY3: V[X] ^= V[Y]
+                else if((opcode & 0x000f) == 0x3) {
+                    vRegisters[(opcode & 0x0f00) >> 8] ^= vRegisters[(opcode & 0x00f0) >> 4];
+                    incProgramCounter();
+                    break;
+                }
+                // 0x8XY4: V[X] += V[Y]
+                else if((opcode & 0x000f) == 0x4) {
+                    int result = unsignedOperation(vRegisters[(opcode & 0x0f00) >> 8],
+                            vRegisters[(opcode & 0x00f0) >> 4], Integer::sum);
+
+                    vRegisters[(opcode & 0x0f00) >> 8] = (byte) result;
+                    vRegisters[0xf] = result > 0xff ? (byte) 1 : (byte) 0;
+
+                    incProgramCounter();
+                    break;
+                }
+                // 0x8XY5: V[X] -= V[Y]; V[F] = (Borrow ? 1 : 0)
+                else if((opcode & 0x000f) == 0x5) {
+                    int result = unsignedOperation(vRegisters[(opcode & 0x0f00) >> 8],
+                            vRegisters[(opcode & 0x00f0) >> 4], (operand1, operand2) -> operand1 - operand2);
+
+                    vRegisters[(opcode & 0x0f00) >> 8] = (byte) result;
+                    vRegisters[0xf] = result < 0 ? (byte) 1 : (byte) 0;
+
+                    incProgramCounter();
+                    break;
+                }
+                // 0x8XY6: V[X] >>= 1; V[F] = LSB(V[X])
+                else if((opcode & 0x000f) == 0x6) {
+                    vRegisters[0xf] = (byte) (vRegisters[(opcode & 0x0f00) >> 8] & 0x01);
+                    vRegisters[(opcode & 0x0f00) >> 8] >>= 1;
+                    incProgramCounter();
+                    break;
+                }
+                // 0x8XY7: V[X] = V[Y] - V[X]; V[F] = (Borrow ? 1 : 0)
+                else if((opcode & 0x000f) == 0x7) {
+                    int result = unsignedOperation(vRegisters[(opcode & 0x0f00) >> 8],
+                            vRegisters[(opcode & 0x00f0) >> 4], (operand1, operand2) -> operand2 - operand1);
+
+                    vRegisters[(opcode & 0x0f00) >> 8] = (byte) result;
+                    vRegisters[0xf] = result < 0 ? (byte) 1 : (byte) 0;
+
+                    incProgramCounter();
+                    break;
+                }
+                // 0x8XYE: V[X] <<= 1; V[F] = MSB(V[X])
+                else if((opcode & 0x000f) == 0xe) {
+                    vRegisters[0xf] = (byte) (vRegisters[(opcode & 0x0f00) >> 8] & 0x80);
+                    vRegisters[(opcode & 0x0f00) >> 8] <<= 1;
+                    incProgramCounter();
+                    break;
+                }
             case 0x9:
                 // 0x9XY0: Skip next instruction if V[X] == V[Y]
-                if((opcode & 0x000f) == 0) {
+                if((opcode & 0x000f) == 0x0) {
                     conditionalJump(vRegisters[(opcode & 0x0f00) >> 8], vRegisters[(opcode & 0x00f0) >> 4],
                             (operand1, operand2) -> !operand1.equals(operand2));
                     incProgramCounter();
@@ -145,19 +217,19 @@ public class Cpu {
             case 0xe:
             case 0xf:
                 // 0xfX1e: index += V[X]
-                if((opcode & 0x00ff) == 0x001e) {
+                if((opcode & 0x00ff) == 0x1e) {
                     indexRegister += vRegisters[(opcode & 0x0f00) >> 8];
                     incProgramCounter();
                     break;
                 }
                 // 0xfX29: index = address of character sprite of V[X]
-                else if((opcode & 0x00ff) == 0x0029) {
+                else if((opcode & 0x00ff) == 0x29) {
                     indexRegister = (short) (Memory.FONT_START + vRegisters[(opcode & 0x0f00) >> 8] * 5);
                     incProgramCounter();
                     break;
                 }
                 // 0xfX55: Write registers V[0] to V[X] consecutively to memory at the address pointed to by the index register
-                else if((opcode & 0x00ff) == 0x0055) {
+                else if((opcode & 0x00ff) == 0x55) {
                     for(int i = 0; i < (opcode & 0x0f00) >> 8; i++) {
                         memory.setByte(indexRegister + i, vRegisters[i]);
                     }
@@ -165,8 +237,28 @@ public class Cpu {
                     incProgramCounter();
                     break;
                 }
+                // 0xfX33: Write registers BCD(V[X]) to memory at the address pointed to by the index register
+                else if((opcode & 0x00ff) == 0x33) {
+                    char[] digits = String.valueOf(vRegisters[(opcode & 0x0f00) >> 8] & 0xff).toCharArray();
+                    int i = 0;
+
+                    // Write leading zeros
+                    while(i < 3 - digits.length) {
+                        memory.setByte(indexRegister + i, (byte) 0);
+                        i++;
+                    }
+
+                    // Write significant digits
+                    while(i < digits.length) {
+                        memory.setByte(indexRegister + i, (byte) Character.getNumericValue(digits[i]));
+                        i++;
+                    }
+
+                    incProgramCounter();
+                    break;
+                }
                 // 0xfX65: Load registers V[0] to V[X] from memory at the address pointed to by the index register
-                else if((opcode & 0x00ff) == 0x0065) {
+                else if((opcode & 0x00ff) == 0x65) {
                     for(int i = 0; i < (opcode & 0x0f00) >> 8; i++) {
                         vRegisters[i] = memory.getByte(indexRegister + i);
                     }

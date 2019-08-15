@@ -8,3 +8,20 @@ jobs:
   include:
     - stage: build-lib
       script: ./gradlew chocol8:jar distZip
+
+before_deploy:
+  - export CHOCOL8_JAR_FILE=$(ls build/chocol8/libs/*.jar)
+  - export DISTRIBUTION_ZIP_FILE=$(ls build/application/distributions/*.jar)
+
+deploy:
+  provider: releases
+  api_key: ${ACCESS_TOKEN}
+  file:
+    - ${RELEASE_JAR_FILE}
+    - ${DISTRIBUTION_ZIP_FILE}
+  skip_cleanup: true
+  overwrite: true
+  on:
+    repo: faruh100/Chocol8-CHIP
+    branch: master
+    tags: true
