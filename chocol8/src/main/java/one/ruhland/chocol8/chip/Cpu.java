@@ -70,6 +70,7 @@ public class Cpu {
                 // 0x00ee: Return from subroutine
                 } else if((opcode & 0x0fff) == 0x0ee) {
                     jumpToAddress(stack.pop());
+                    break;
                 } else {
                     throw new IllegalArgumentException(String.format("Unknown opcode: 0x%04x!\n", opcode));
                 }
@@ -80,8 +81,9 @@ public class Cpu {
                 break;
             case 0x2:
                 // 0x2NNN: Call subroutine at NNN
-                stack.push(programCounter);
+                stack.push((short) (programCounter + 2));
                 jumpToAddress((short) (opcode & 0x0fff));
+                break;
             case 0x3:
                 // 0x3XNN: Skip next instruction if V[X] == NN
                 conditionalJump(vRegisters[(opcode & 0x0f00) >> 8], (byte) (opcode & 0x00ff), Byte::equals);
@@ -116,6 +118,12 @@ public class Cpu {
                 incProgramCounter();
                 break;
             case 0x8:
+                // 0x8XY0: V[X] = V[Y]
+                if((opcode & 0x000f) == 0x0) {
+                    vRegisters[(opcode & 0x0f00) >> 8] = vRegisters[(opcode & 0x00f0) >> 4];
+                    incProgramCounter();
+                    break;
+                }
                 // 0x8XY1: V[X] |= V[Y]
                 if((opcode & 0x000f) == 0x1) {
                     vRegisters[(opcode & 0x0f00) >> 8] |= vRegisters[(opcode & 0x00f0) >> 4];
@@ -204,6 +212,11 @@ public class Cpu {
                 break;
             }
             case 0xc:
+                // 0xCXNN: V[X] &= NN
+                vRegisters[(opcode & 0x0f00) >> 8] = (byte) unsignedOperation(vRegisters[(opcode & 0x0f00) >> 8],
+                        (byte) (Math.random() * 0xff), (operand1, operand2) -> operand1 & operand2);
+                incProgramCounter();
+                break;
             case 0xd: {
                 byte x = vRegisters[(opcode & 0x0f00) >> 8];
                 byte y = vRegisters[(opcode & 0x00f0) >> 4];

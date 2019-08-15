@@ -22,6 +22,6 @@ public class Stack {
             throw new IllegalStateException("Tryring to pop from empty stack!");
         }
 
-        return stack[stackPointer--];
+        return stack[--stackPointer];
     }
 }
