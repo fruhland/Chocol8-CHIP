@@ -1,0 +1,10 @@
+language: java
+dist: xenial
+
+stages:
+  - name: build
+
+jobs:
+  include:
+    - stage: build-lib
+      script: ./gradlew chocol8:jar distZip
