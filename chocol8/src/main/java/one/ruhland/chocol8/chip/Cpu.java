@@ -8,8 +8,8 @@ public class Cpu {
     private byte[] vRegisters = new byte[0x10];
     private short programCounter = 0x0200;
     private short indexRegister = 0x0000;
-    private short stackPointer = 0x0000;
 
+    private final Stack stack = new Stack((byte) 16);
     private final Memory memory;
     private final Graphics graphics;
 
@@ -75,6 +75,9 @@ public class Cpu {
                     graphics.reset();
                     incProgramCounter();
                     break;
+                // 0x00ee: Return from subroutine
+                } else if((opcode & 0x0fff) == 0x0ee) {
+                    jumpToAddress(stack.pop());
                 } else {
                     throw new IllegalArgumentException(String.format("Unknown opcode: 0x%04x!\n", opcode));
                 }
@@ -84,6 +87,9 @@ public class Cpu {
                 jumpToAddress((short) (opcode & 0x0fff));
                 break;
             case 0x2:
+                // 0x2NNN: Call subroutine at NNN
+                stack.push(programCounter);
+                jumpToAddress((short) (opcode & 0x0fff));
             case 0x3:
                 // 0x3XNN: Skip next instruction if V[X] == NN
                 conditionalJump(vRegisters[(opcode & 0x0f00) >> 8], (byte) (opcode & 0x00ff), Byte::equals);
@@ -181,6 +187,8 @@ public class Cpu {
                     vRegisters[(opcode & 0x0f00) >> 8] <<= 1;
                     incProgramCounter();
                     break;
+                } else {
+                    throw new IllegalArgumentException(String.format("Unknown opcode: 0x%04x!\n", opcode));
                 }
             case 0x9:
                 // 0x9XY0: Skip next instruction if V[X] == V[Y]

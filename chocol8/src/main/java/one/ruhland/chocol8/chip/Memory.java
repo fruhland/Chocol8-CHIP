@@ -4,8 +4,10 @@ import java.util.Arrays;
 
 public class Memory {
 
-    static final int MEMORY_SIZE = 0x0fff;
+    static final int MEMORY_SIZE = 0x1000;
+
     static final int PROGRAM_START = 0x0200;
+
     static final int FONT_SIZE = 0x0050;
     static final int FONT_START = PROGRAM_START - FONT_SIZE;
 
