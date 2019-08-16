@@ -24,4 +24,9 @@ public class Stack {
 
         return stack[--stackPointer];
     }
+
+    void reset() {
+        stack = new short[stack.length];
+        stackPointer = 0x00;
+    }
 }

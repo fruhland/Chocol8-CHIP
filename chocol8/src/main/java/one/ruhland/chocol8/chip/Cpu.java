@@ -21,8 +21,10 @@ public class Cpu {
     }
 
     void reset() {
+        stack.reset();
         Arrays.fill(vRegisters, (byte) 0);
         programCounter = 0x0200;
+        indexRegister = 0x0000;
     }
 
     public void setFrequency(double frequency) {
