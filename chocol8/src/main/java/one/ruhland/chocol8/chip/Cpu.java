@@ -5,6 +5,8 @@ import java.util.function.BiFunction;
 
 public class Cpu {
 
+    private double frequency = 1000;
+
     private byte[] vRegisters = new byte[0x10];
     private short programCounter = 0x0200;
     private short indexRegister = 0x0000;
@@ -23,10 +25,28 @@ public class Cpu {
         programCounter = 0x0200;
     }
 
+    public void setFrequency(double frequency) {
+        this.frequency = frequency;
+    }
+
+    public double getFrequency() {
+        return frequency;
+    }
+
     public void runCycle() {
+        long start = System.nanoTime();
+
         short opcode = (short) unsignedOperation(memory.getByte(programCounter), memory.getByte(programCounter + 1),
                 (operand1, operand2) -> operand1 << 8 | operand2);
         executeOpcode(opcode);
+
+        long end = System.nanoTime();
+        double sleepTime = (1.0 / frequency) * 1000000000 - (end -  start);
+
+        long slept = 0;
+        while(sleepTime > slept) {
+            slept = System.nanoTime() - end;
+        }
     }
 
     private void incProgramCounter() {

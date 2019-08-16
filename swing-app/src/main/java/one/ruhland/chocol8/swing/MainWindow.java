@@ -4,6 +4,8 @@ import one.ruhland.chocol8.chip.Machine;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
 
 public class MainWindow extends JFrame {
@@ -45,8 +47,8 @@ public class MainWindow extends JFrame {
 
         // Setup file menu
         var openItem = new JMenuItem("Open");
-        openItem.addActionListener(e -> {
-            JFileChooser chooser = new JFileChooser(lastFolder);
+        openItem.addActionListener(actionEvent -> {
+            var chooser = new JFileChooser(lastFolder);
             chooser.setFileFilter(FILTER);
 
             int ret = chooser.showOpenDialog(this);
@@ -56,7 +58,6 @@ public class MainWindow extends JFrame {
                 try {
                     machine.loadProgram(chooser.getSelectedFile().getAbsolutePath());
                     machine.run();
-                    setTitle(WINDOW_TITLE + " - " + chooser.getSelectedFile().getName());
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }
@@ -64,13 +65,12 @@ public class MainWindow extends JFrame {
         });
 
         var closeItem = new JMenuItem("Close");
-        closeItem.addActionListener(e -> {
+        closeItem.addActionListener(actionEvent -> {
             machine.reset();
-            setTitle(WINDOW_TITLE);
         });
 
         var exitItem = new JMenuItem("Exit");
-        exitItem.addActionListener(e -> {
+        exitItem.addActionListener(actionEvent -> {
             setVisible(false);
             dispose();
             System.exit(0);
@@ -87,14 +87,32 @@ public class MainWindow extends JFrame {
             final int factor = i;
 
             var item = new JMenuItem(factor + "X");
-            item.addActionListener(e -> {
+            item.addActionListener(actionEvent -> {
                 ((SwingGraphics) machine.getGraphics()).getPanel().setScaleFactor(factor);
                 pack();
             });
 
             scaleMenu.add(item);
         }
+        
+        var frequencyItem = new JMenuItem("CPU frequency");
+        frequencyItem.addActionListener(actionEvent -> {
+            var string = JOptionPane.showInputDialog(null, "Please enter the desired frequency in Hz (1-1000000):");
 
+            if(string == null || string.isEmpty()) {
+                return;
+            }
+
+            var frequency = Integer.parseInt(string);
+
+            if (frequency < 1 || frequency > 1000000) {
+                throw new IllegalArgumentException("Frequency must be between 1 and 1000000 Hz!");
+            }
+
+            machine.getCpu().setFrequency(frequency);
+        });
+
+        optionsMenu.add(frequencyItem);
         optionsMenu.add(scaleMenu);
 
         setJMenuBar(menuBar);

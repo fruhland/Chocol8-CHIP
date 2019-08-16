@@ -17,15 +17,22 @@ import java.util.concurrent.Callable;
 public class Emulate implements Callable<Void> {
 
     @CommandLine.Option(
-            names = {"-f", "--file" },
-            description = "The CHIP-8 ROM to execute")
+            names = {"-o", "--open" },
+            description = "The CHIP-8 ROM to open")
     private String romPath;
+
+    @CommandLine.Option(
+            names = {"-f", "--frequency" },
+            description = "The CPU frequency")
+    private int cpuFrequency = 1000;
 
     @Override
     public Void call() throws Exception {
         var machine = new Machine(SwingGraphics.class);
         var window = new MainWindow(machine);
         window.setVisible(true);
+
+        machine.getCpu().setFrequency(cpuFrequency);
 
         if(romPath != null) {
             try {
