@@ -279,19 +279,10 @@ public class Cpu {
                 }
                 // 0xfX33: Write BCD(V[X]) to memory at the address pointed to by the index register
                 else if((opcode & 0x00ff) == 0x33) {
-                    char[] digits = String.valueOf(getUnsignedByte(vRegisters[(opcode & 0x0f00) >> 8])).toCharArray();
-                    int i = 0;
+                    char[] digits = String.format("%03d", getUnsignedByte(vRegisters[(opcode & 0x0f00) >> 8])).toCharArray();
 
-                    // Write leading zeros
-                    while(i < 3 - digits.length) {
-                        memory.setByte(indexRegister + i, (byte) 0);
-                        i++;
-                    }
-
-                    // Write significant digits
-                    while(i < digits.length) {
+                    for(int i = 0; i < 3; i++) {
                         memory.setByte(indexRegister + i, (byte) Character.getNumericValue(digits[i]));
-                        i++;
                     }
 
                     incProgramCounter();
