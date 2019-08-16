@@ -185,7 +185,7 @@ public class Cpu {
                             vRegisters[(opcode & 0x00f0) >> 4], (operand1, operand2) -> operand1 - operand2);
 
                     vRegisters[(opcode & 0x0f00) >> 8] = (byte) result;
-                    vRegisters[0xf] = result < 0 ? (byte) 1 : (byte) 0;
+                    vRegisters[0xf] = result < 0 ? (byte) 0 : (byte) 1;
 
                     incProgramCounter();
                     break;
@@ -203,7 +203,7 @@ public class Cpu {
                             vRegisters[(opcode & 0x00f0) >> 4], (operand1, operand2) -> operand2 - operand1);
 
                     vRegisters[(opcode & 0x0f00) >> 8] = (byte) result;
-                    vRegisters[0xf] = result < 0 ? (byte) 1 : (byte) 0;
+                    vRegisters[0xf] = result < 0 ? (byte) 0 : (byte) 1;
 
                     incProgramCounter();
                     break;
