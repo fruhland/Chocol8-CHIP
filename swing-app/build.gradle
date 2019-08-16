@@ -1,9 +1,12 @@
 plugins {
-    id 'java-library'
+    id 'application'
 }
 
 group 'one.ruhland'
 version = getProperty('projectVersion')
+
+mainClassName = 'one.ruhland.chocol8.swing.Application'
+applicationName = 'chocol8'
 
 compileJava {
     sourceCompatibility = '11'
@@ -17,4 +20,6 @@ repositories {
 
 dependencies {
     implementation project(':chocol8')
+
+    implementation 'info.picocli:picocli:3.9.6'
 }

@@ -1,6 +1,6 @@
-package one.ruhland.chocol8.application;
+package one.ruhland.chocol8.swing;
 
-import one.ruhland.chocol8.application.commands.Root;
+import one.ruhland.chocol8.swing.commands.Root;
 import picocli.CommandLine;
 
 public class Application {

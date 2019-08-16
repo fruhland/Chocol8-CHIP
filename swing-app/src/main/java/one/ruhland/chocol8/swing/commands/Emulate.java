@@ -1,8 +1,10 @@
-package one.ruhland.chocol8.application.commands;
+package one.ruhland.chocol8.swing.commands;
 
+import java.io.File;
+import java.io.IOException;
+import one.ruhland.chocol8.chip.Machine;
 import one.ruhland.chocol8.swing.MainWindow;
 import one.ruhland.chocol8.swing.SwingGraphics;
-import one.ruhland.chocol8.chip.Machine;
 import picocli.CommandLine;
 
 import java.util.concurrent.Callable;
@@ -26,8 +28,13 @@ public class Emulate implements Callable<Void> {
         window.setVisible(true);
 
         if(romPath != null) {
-            machine.loadProgram(romPath);
-            machine.run();
+            try {
+                machine.loadProgram(romPath);
+                window.setTitle(window.getTitle() + " - " + new File(romPath).getName());
+                machine.run();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
         return null;

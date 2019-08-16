@@ -4,6 +4,8 @@ import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.stream.Collectors;
+import one.ruhland.chocol8.generated.BuildConfig;
 
 public class Machine {
 
@@ -59,5 +61,20 @@ public class Machine {
 
     public Cpu getCpu() {
         return cpu;
+    }
+
+    public static void printBanner() {
+        InputStream inputStream = Machine.class.getClassLoader().getResourceAsStream("banner.txt");
+
+        if (inputStream == null) {
+            return;
+        }
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+        String banner = reader.lines().collect(Collectors.joining(System.lineSeparator()));
+
+        System.out.print("\n");
+        System.out.printf(banner, BuildConfig.VERSION, BuildConfig.BUILD_DATE, BuildConfig.GIT_BRANCH, BuildConfig.GIT_COMMIT);
+        System.out.print("\n\n");
     }
 }

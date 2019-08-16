@@ -1,5 +1,6 @@
-package one.ruhland.chocol8.application.commands;
+package one.ruhland.chocol8.swing.commands;
 
+import one.ruhland.chocol8.chip.Machine;
 import picocli.CommandLine;
 
 @CommandLine.Command(
@@ -11,6 +12,6 @@ public class Root implements Runnable {
 
     @Override
     public void run() {
-
+        Machine.printBanner();
     }
 }

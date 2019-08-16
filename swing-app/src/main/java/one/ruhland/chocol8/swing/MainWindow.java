@@ -8,6 +8,7 @@ import java.io.IOException;
 
 public class MainWindow extends JFrame {
 
+    private static final String WINDOW_TITLE = "Chocol8 CHIP";
     private static final FileNameExtensionFilter FILTER = new FileNameExtensionFilter("CHIP-8", "ch8");
 
     private final Machine machine;
@@ -24,7 +25,7 @@ public class MainWindow extends JFrame {
         }
 
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        setTitle("Chocol8 CHIP");
+        setTitle(WINDOW_TITLE);
         setResizable(false);
 
         setupMenu();
@@ -55,6 +56,7 @@ public class MainWindow extends JFrame {
                 try {
                     machine.loadProgram(chooser.getSelectedFile().getAbsolutePath());
                     machine.run();
+                    setTitle(WINDOW_TITLE + " - " + chooser.getSelectedFile().getName());
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }
@@ -64,6 +66,7 @@ public class MainWindow extends JFrame {
         var closeItem = new JMenuItem("Close");
         closeItem.addActionListener(e -> {
             machine.reset();
+            setTitle(WINDOW_TITLE);
         });
 
         var exitItem = new JMenuItem("Exit");

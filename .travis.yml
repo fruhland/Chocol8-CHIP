@@ -6,19 +6,19 @@ stages:
 
 jobs:
   include:
-    - stage: build-lib
-      script: ./gradlew chocol8:jar distZip
+    - stage: build
+      script: ./gradlew chocol8:jar swing-app:distZip
 
 before_deploy:
   - export CHOCOL8_JAR_FILE=$(ls build/chocol8/libs/*.jar)
-  - export DISTRIBUTION_ZIP_FILE=$(ls build/application/distributions/*.jar)
+  - export SWING_ZIP_FILE=$(ls build/swing-app/distributions/*.jar)
 
 deploy:
   provider: releases
   api_key: ${ACCESS_TOKEN}
   file:
     - ${RELEASE_JAR_FILE}
-    - ${DISTRIBUTION_ZIP_FILE}
+    - ${SWING_ZIP_FILE}
   skip_cleanup: true
   overwrite: true
   on:
