@@ -43,18 +43,18 @@ public class Cpu {
         programCounter = address;
     }
 
-    private void conditionalJump(byte operand1, byte operand2, BiFunction<Byte, Byte, Boolean> operator) {
-        if(operator.apply(operand1, operand2)) {
+    private int getUnsignedByte(byte value) {
+        return value & 0xff;
+    }
+
+    private void conditionalJump(byte operand1, byte operand2, BiFunction<Integer, Integer, Boolean> operator) {
+        if(operator.apply(getUnsignedByte(operand1), getUnsignedByte(operand2))) {
             incProgramCounter();
         }
     }
 
     private int unsignedOperation(byte operand1, byte operand2, BiFunction<Integer, Integer, Integer> operator) {
-        return operator.apply(operand1 & 0xff, operand2 & 0xff);
-    }
-
-    private int byteToUnsignedInt(byte value) {
-        return value & 0xff;
+        return operator.apply(getUnsignedByte(operand1), getUnsignedByte(operand2));
     }
 
     private void executeOpcode(final short opcode) {
@@ -70,6 +70,7 @@ public class Cpu {
                 // 0x00ee: Return from subroutine
                 } else if((opcode & 0x0fff) == 0x0ee) {
                     jumpToAddress(stack.pop());
+                    incProgramCounter();
                     break;
                 } else {
                     throw new IllegalArgumentException(String.format("Unknown opcode: 0x%04x!\n", opcode));
@@ -81,12 +82,12 @@ public class Cpu {
                 break;
             case 0x2:
                 // 0x2NNN: Call subroutine at NNN
-                stack.push((short) (programCounter + 2));
+                stack.push((programCounter));
                 jumpToAddress((short) (opcode & 0x0fff));
                 break;
             case 0x3:
                 // 0x3XNN: Skip next instruction if V[X] == NN
-                conditionalJump(vRegisters[(opcode & 0x0f00) >> 8], (byte) (opcode & 0x00ff), Byte::equals);
+                conditionalJump(vRegisters[(opcode & 0x0f00) >> 8], (byte) (opcode & 0x00ff), Integer::equals);
                 incProgramCounter();
                 break;
             case 0x4: {
@@ -99,7 +100,7 @@ public class Cpu {
             case 0x5: {
                 // 0x5XY0: Skip next instruction if V[X] == V[Y]
                 if((opcode & 0x000f) == 0x0) {
-                    conditionalJump(vRegisters[(opcode & 0x0f00) >> 8], vRegisters[(opcode & 0x00f0) >> 4], Byte::equals);
+                    conditionalJump(vRegisters[(opcode & 0x0f00) >> 8], vRegisters[(opcode & 0x00f0) >> 4], Integer::equals);
                     incProgramCounter();
                     break;
                 } else {
@@ -126,19 +127,22 @@ public class Cpu {
                 }
                 // 0x8XY1: V[X] |= V[Y]
                 if((opcode & 0x000f) == 0x1) {
-                    vRegisters[(opcode & 0x0f00) >> 8] |= vRegisters[(opcode & 0x00f0) >> 4];
+                    vRegisters[(opcode & 0x0f00) >> 8] = (byte) unsignedOperation(vRegisters[(opcode & 0x0f00) >> 8],
+                            vRegisters[(opcode & 0x00f0) >> 4], (operand1, operand2) -> operand1 | operand2);
                     incProgramCounter();
                     break;
                 }
                 // 0x8XY2: V[X] &= V[Y]
                 else if((opcode & 0x000f) == 0x2) {
-                    vRegisters[(opcode & 0x0f00) >> 8] &= vRegisters[(opcode & 0x00f0) >> 4];
+                    vRegisters[(opcode & 0x0f00) >> 8] = (byte) unsignedOperation(vRegisters[(opcode & 0x0f00) >> 8],
+                            vRegisters[(opcode & 0x00f0) >> 4], (operand1, operand2) -> operand1 & operand2);
                     incProgramCounter();
                     break;
                 }
                 // 0x8XY3: V[X] ^= V[Y]
                 else if((opcode & 0x000f) == 0x3) {
-                    vRegisters[(opcode & 0x0f00) >> 8] ^= vRegisters[(opcode & 0x00f0) >> 4];
+                    vRegisters[(opcode & 0x0f00) >> 8] = (byte) unsignedOperation(vRegisters[(opcode & 0x0f00) >> 8],
+                            vRegisters[(opcode & 0x00f0) >> 4], (operand1, operand2) -> operand1 ^ operand2);
                     incProgramCounter();
                     break;
                 }
@@ -192,7 +196,7 @@ public class Cpu {
                     throw new IllegalArgumentException(String.format("Unknown opcode: 0x%04x!\n", opcode));
                 }
             case 0x9:
-                // 0x9XY0: Skip next instruction if V[X] == V[Y]
+                // 0x9XY0: Skip next instruction if V[X] != V[Y]
                 if((opcode & 0x000f) == 0x0) {
                     conditionalJump(vRegisters[(opcode & 0x0f00) >> 8], vRegisters[(opcode & 0x00f0) >> 4],
                             (operand1, operand2) -> !operand1.equals(operand2));
@@ -208,13 +212,12 @@ public class Cpu {
                 break;
             case 0xb: {
                 // 0xBNNN: Jump to V[0] + NNN
-                jumpToAddress((short) ((opcode & 0x0fff) + vRegisters[0]));
+                jumpToAddress((short) (getUnsignedByte(vRegisters[0]) + (opcode & 0x0fff)));
                 break;
             }
             case 0xc:
-                // 0xCXNN: V[X] &= NN
-                vRegisters[(opcode & 0x0f00) >> 8] = (byte) unsignedOperation(vRegisters[(opcode & 0x0f00) >> 8],
-                        (byte) (Math.random() * 0xff), (operand1, operand2) -> operand1 & operand2);
+                // 0xCXNN: V[X] = rand() & NN
+                vRegisters[(opcode & 0x0f00) >> 8] = (byte) (((int) (Math.random() * 0xff)) & (opcode & 0x00ff));
                 incProgramCounter();
                 break;
             case 0xd: {
@@ -233,28 +236,28 @@ public class Cpu {
             case 0xf:
                 // 0xfX1e: index += V[X]
                 if((opcode & 0x00ff) == 0x1e) {
-                    indexRegister += vRegisters[(opcode & 0x0f00) >> 8];
+                    indexRegister += getUnsignedByte(vRegisters[(opcode & 0x0f00) >> 8]);
                     incProgramCounter();
                     break;
                 }
                 // 0xfX29: index = address of character sprite of V[X]
                 else if((opcode & 0x00ff) == 0x29) {
-                    indexRegister = (short) (Memory.FONT_START + vRegisters[(opcode & 0x0f00) >> 8] * 5);
+                    indexRegister = (short) (Memory.FONT_START + getUnsignedByte(vRegisters[(opcode & 0x0f00) >> 8]) * 5);
                     incProgramCounter();
                     break;
                 }
                 // 0xfX55: Write registers V[0] to V[X] consecutively to memory at the address pointed to by the index register
                 else if((opcode & 0x00ff) == 0x55) {
-                    for(int i = 0; i < (opcode & 0x0f00) >> 8; i++) {
+                    for(int i = 0; i <= (opcode & 0x0f00) >> 8; i++) {
                         memory.setByte(indexRegister + i, vRegisters[i]);
                     }
 
                     incProgramCounter();
                     break;
                 }
-                // 0xfX33: Write registers BCD(V[X]) to memory at the address pointed to by the index register
+                // 0xfX33: Write BCD(V[X]) to memory at the address pointed to by the index register
                 else if((opcode & 0x00ff) == 0x33) {
-                    char[] digits = String.valueOf(vRegisters[(opcode & 0x0f00) >> 8] & 0xff).toCharArray();
+                    char[] digits = String.valueOf(getUnsignedByte(vRegisters[(opcode & 0x0f00) >> 8])).toCharArray();
                     int i = 0;
 
                     // Write leading zeros
@@ -274,7 +277,7 @@ public class Cpu {
                 }
                 // 0xfX65: Load registers V[0] to V[X] from memory at the address pointed to by the index register
                 else if((opcode & 0x00ff) == 0x65) {
-                    for(int i = 0; i < (opcode & 0x0f00) >> 8; i++) {
+                    for(int i = 0; i <= (opcode & 0x0f00) >> 8; i++) {
                         vRegisters[i] = memory.getByte(indexRegister + i);
                     }
 

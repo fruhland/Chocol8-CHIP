@@ -11,7 +11,7 @@ public class Stack {
 
     void push(short address) {
         if(stackPointer >= stack.length) {
-            throw new IllegalStateException("Trying to push to full stack!");
+            throw new IllegalStateException("Trying to push to full stack (Stack size: " + stack.length + ")!");
         }
 
         stack[stackPointer++] = address;

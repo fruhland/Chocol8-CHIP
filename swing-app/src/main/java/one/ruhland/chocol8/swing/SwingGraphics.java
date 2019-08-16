@@ -60,8 +60,14 @@ public class SwingGraphics extends Graphics {
         }
 
         boolean flipPixel(int x, int y) {
-            frameBuffer[x + y * resolutionX] = !frameBuffer[x + y * resolutionX];
-            return !frameBuffer[x + y * resolutionX];
+            int pos = x + y * resolutionX;
+
+            if(pos < 0 || pos >= frameBuffer.length) {
+                return false;
+            }
+
+            frameBuffer[pos] = !frameBuffer[pos];
+            return !frameBuffer[pos];
         }
 
         void reset() {
