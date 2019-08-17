@@ -5,19 +5,24 @@ import java.util.function.BiFunction;
 
 public class Cpu {
 
-    private double frequency = 1000;
+    private static final double DEFAULT_FREQUENCY = 1000;
 
     private byte[] vRegisters = new byte[0x10];
     private short programCounter = 0x0200;
     private short indexRegister = 0x0000;
 
-    private final Stack stack = new Stack((byte) 16);
+
     private final Memory memory;
     private final Graphics graphics;
+    private final Stack stack;
+    private final Clock clock;
 
     Cpu(final Memory memory, final Graphics graphics) {
         this.memory = memory;
         this.graphics = graphics;
+
+        stack = new Stack((byte) 16);
+        clock = new Clock(DEFAULT_FREQUENCY, this::runCycle);
     }
 
     void reset() {
@@ -27,28 +32,22 @@ public class Cpu {
         indexRegister = 0x0000;
     }
 
-    public void setFrequency(double frequency) {
-        this.frequency = frequency;
+    void start() {
+        clock.start();
     }
 
-    public double getFrequency() {
-        return frequency;
+    void stop() {
+        clock.stop();
     }
 
     public void runCycle() {
-        long start = System.nanoTime();
-
         short opcode = (short) unsignedOperation(memory.getByte(programCounter), memory.getByte(programCounter + 1),
                 (operand1, operand2) -> operand1 << 8 | operand2);
         executeOpcode(opcode);
+    }
 
-        long end = System.nanoTime();
-        double sleepTime = (1.0 / frequency) * 1000000000 - (end -  start);
-
-        long slept = 0;
-        while(sleepTime > slept) {
-            slept = System.nanoTime() - end;
-        }
+    public Clock getClock() {
+        return clock;
     }
 
     private void incProgramCounter() {

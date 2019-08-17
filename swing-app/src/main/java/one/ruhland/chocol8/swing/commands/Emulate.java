@@ -32,13 +32,13 @@ public class Emulate implements Callable<Void> {
         var window = new MainWindow(machine);
         window.setVisible(true);
 
-        machine.getCpu().setFrequency(cpuFrequency);
+        machine.getCpu().getClock().setFrequency(cpuFrequency);
 
         if(romPath != null) {
             try {
                 machine.loadProgram(romPath);
                 window.setTitle(window.getTitle() + " - " + new File(romPath).getName());
-                machine.run();
+                machine.start();
             } catch (IOException e) {
                 e.printStackTrace();
             }

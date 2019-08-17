@@ -13,10 +13,6 @@ public class Machine {
     private final Graphics graphics;
     private final Cpu cpu;
 
-    private boolean isRunning = false;
-
-    private Thread cpuThread;
-
     public Machine(final Class<? extends Graphics> graphicsClass) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
         this.memory = new Memory();
         this.graphics = graphicsClass.getConstructor(int.class, int.class, Memory.class).newInstance(64, 32, memory);
@@ -35,28 +31,12 @@ public class Machine {
         memory.setBytes(Memory.PROGRAM_START, Files.readAllBytes(Paths.get(fileName)));
     }
 
-    public void run() {
-        if(isRunning) {
-            return;
-        }
-
-        isRunning = true;
-
-        cpuThread = new Thread(() -> {
-            while(isRunning) {
-                cpu.runCycle();
-            }
-        }, "Emulator-Thread");
-
-        cpuThread.start();
+    public void start() {
+        cpu.start();
     }
 
     public void stop() {
-        isRunning = false;
-        try {
-            if(cpuThread != null && cpuThread.isAlive())
-            cpuThread.join();
-        } catch (InterruptedException ignored) {}
+        cpu.stop();
     }
 
     public Memory getMemory() {

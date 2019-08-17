@@ -4,8 +4,6 @@ import one.ruhland.chocol8.chip.Machine;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.IOException;
 
 public class MainWindow extends JFrame {
@@ -57,7 +55,7 @@ public class MainWindow extends JFrame {
             if(ret == JFileChooser.APPROVE_OPTION) {
                 try {
                     machine.loadProgram(chooser.getSelectedFile().getAbsolutePath());
-                    machine.run();
+                    machine.start();
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }
@@ -109,7 +107,7 @@ public class MainWindow extends JFrame {
                 throw new IllegalArgumentException("Frequency must be between 1 and 1000000 Hz!");
             }
 
-            machine.getCpu().setFrequency(frequency);
+            machine.getCpu().getClock().setFrequency(frequency);
         });
 
         optionsMenu.add(frequencyItem);
