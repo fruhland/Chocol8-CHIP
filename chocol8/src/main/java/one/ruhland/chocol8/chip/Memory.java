@@ -39,7 +39,7 @@ public class Memory {
         System.arraycopy(FONT, 0, memory, FONT_START, FONT_SIZE);
     }
 
-    public byte getByte(int address) {
+    public byte getByte(final int address) {
         if(address < 0 || address >= MEMORY_SIZE) {
             throw new IllegalArgumentException(String.format("Invalid address: 0x%x", address));
         }
@@ -47,7 +47,7 @@ public class Memory {
         return memory[address];
     }
 
-    public void setByte(int address, byte value) {
+    public void setByte(final int address, final byte value) {
         if(address < 0 || address >= MEMORY_SIZE) {
             throw new IllegalArgumentException(String.format("Invalid address: 0x%x", address));
         }
@@ -55,7 +55,7 @@ public class Memory {
         memory[address] = value;
     }
 
-    public void setBytes(int address, byte[] bytes) {
+    public void setBytes(final int address, final byte[] bytes) {
         if(address < 0 || address + bytes.length >= MEMORY_SIZE) {
             throw new IllegalArgumentException(String.format("Invalid address: 0x%x (Size: 0x%x)", address, bytes.length));
         }

@@ -9,7 +9,7 @@ public class Stack {
         stack = new short[size];
     }
 
-    void push(short address) {
+    void push(final short address) {
         if(stackPointer >= stack.length) {
             throw new IllegalStateException("Trying to push to full stack (Stack size: " + stack.length + ")!");
         }

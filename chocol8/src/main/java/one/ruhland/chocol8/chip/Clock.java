@@ -52,7 +52,7 @@ public class Clock {
         return frequency;
     }
 
-    public void setFrequency(double frequency) {
+    public void setFrequency(final double frequency) {
         this.frequency = frequency;
     }
 }

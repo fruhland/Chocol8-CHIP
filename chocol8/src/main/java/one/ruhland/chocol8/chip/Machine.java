@@ -12,11 +12,13 @@ public class Machine {
     private final Memory memory;
     private final Graphics graphics;
     private final Cpu cpu;
+    private final Timer timer;
 
     public Machine(final Class<? extends Graphics> graphicsClass) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
-        this.memory = new Memory();
-        this.graphics = graphicsClass.getConstructor(int.class, int.class, Memory.class).newInstance(64, 32, memory);
-        this.cpu = new Cpu(memory, graphics);
+        memory = new Memory();
+        graphics = graphicsClass.getConstructor(int.class, int.class, Memory.class).newInstance(64, 32, memory);
+        timer = new Timer();
+        cpu = new Cpu(memory, graphics, timer);
     }
 
     public void reset() {
@@ -45,6 +47,10 @@ public class Machine {
 
     public Graphics getGraphics() {
         return graphics;
+    }
+
+    public Timer getTimer() {
+        return timer;
     }
 
     public Cpu getCpu() {

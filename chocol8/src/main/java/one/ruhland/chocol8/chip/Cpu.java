@@ -11,33 +11,38 @@ public class Cpu {
     private short programCounter = 0x0200;
     private short indexRegister = 0x0000;
 
-
     private final Memory memory;
     private final Graphics graphics;
-    private final Stack stack;
-    private final Clock clock;
+    private final Timer timer;
 
-    Cpu(final Memory memory, final Graphics graphics) {
+    private final Clock clock;
+    private final Stack stack;
+
+    Cpu(final Memory memory, final Graphics graphics, final Timer timer) {
         this.memory = memory;
         this.graphics = graphics;
+        this.timer = timer;
 
-        stack = new Stack((byte) 16);
         clock = new Clock(DEFAULT_FREQUENCY, this::runCycle);
+        stack = new Stack((byte) 16);
     }
 
     void reset() {
         stack.reset();
+        timer.reset();
         Arrays.fill(vRegisters, (byte) 0);
         programCounter = 0x0200;
         indexRegister = 0x0000;
     }
 
     void start() {
+        timer.start();
         clock.start();
     }
 
     void stop() {
         clock.stop();
+        timer.stop();
     }
 
     public void runCycle() {
@@ -64,17 +69,17 @@ public class Cpu {
         programCounter = address;
     }
 
-    private int getUnsignedByte(byte value) {
+    private int getUnsignedByte(final byte value) {
         return value & 0xff;
     }
 
-    private void conditionalJump(byte operand1, byte operand2, BiFunction<Integer, Integer, Boolean> operator) {
+    private void conditionalJump(final byte operand1, final byte operand2, final BiFunction<Integer, Integer, Boolean> operator) {
         if(operator.apply(getUnsignedByte(operand1), getUnsignedByte(operand2))) {
             incProgramCounter();
         }
     }
 
-    private int unsignedOperation(byte operand1, byte operand2, BiFunction<Integer, Integer, Integer> operator) {
+    private int unsignedOperation(final byte operand1, final byte operand2, final BiFunction<Integer, Integer, Integer> operator) {
         return operator.apply(getUnsignedByte(operand1), getUnsignedByte(operand2));
     }
 
@@ -255,6 +260,18 @@ public class Cpu {
             }
             case 0xe:
             case 0xf:
+                // 0xfX07: V[X] = timer
+                if((opcode & 0x00ff) == 0x07) {
+                    vRegisters[(opcode & 0x0f00) >> 8] = timer.getCounter();
+                    incProgramCounter();
+                    break;
+                }
+                // 0xfX15: timer = V[X]
+                if((opcode & 0x00ff) == 0x15) {
+                    timer.setCounter(vRegisters[(opcode & 0x0f00) >> 8]);
+                    incProgramCounter();
+                    break;
+                }
                 // 0xfX1e: index += V[X]
                 if((opcode & 0x00ff) == 0x1e) {
                     indexRegister += getUnsignedByte(vRegisters[(opcode & 0x0f00) >> 8]);

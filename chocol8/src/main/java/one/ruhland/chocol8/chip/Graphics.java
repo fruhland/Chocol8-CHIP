@@ -40,7 +40,7 @@ public abstract class Graphics {
         return resolutionY;
     }
 
-    protected abstract boolean flipPixel(int x, int y);
+    protected abstract boolean flipPixel(final int x, final int y);
 
     protected abstract void reset();
 
