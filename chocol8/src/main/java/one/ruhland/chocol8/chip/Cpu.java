@@ -13,17 +13,19 @@ public class Cpu {
 
     private final Memory memory;
     private final Graphics graphics;
+    private final Sound sound;
     private final Timer timer;
 
     private final Clock clock;
     private final Stack stack;
 
-    Cpu(final Memory memory, final Graphics graphics, final Timer timer) {
+    Cpu(final Memory memory, final Graphics graphics, final Sound sound, final Timer timer) {
         this.memory = memory;
         this.graphics = graphics;
+        this.sound = sound;
         this.timer = timer;
 
-        clock = new Clock(DEFAULT_FREQUENCY, this::runCycle);
+        clock = new Clock(DEFAULT_FREQUENCY, "CpuThread", this::runCycle);
         stack = new Stack((byte) 16);
     }
 
@@ -37,11 +39,13 @@ public class Cpu {
 
     void start() {
         timer.start();
+        sound.start();
         clock.start();
     }
 
     void stop() {
         clock.stop();
+        sound.stop();
         timer.stop();
     }
 
@@ -269,6 +273,12 @@ public class Cpu {
                 // 0xfX15: timer = V[X]
                 if((opcode & 0x00ff) == 0x15) {
                     timer.setCounter(vRegisters[(opcode & 0x0f00) >> 8]);
+                    incProgramCounter();
+                    break;
+                }
+                // 0xfX18: soundTimer = V[X]
+                if((opcode & 0x00ff) == 0x18) {
+                    sound.setCounter(vRegisters[(opcode & 0x0f00) >> 8]);
                     incProgramCounter();
                     break;
                 }

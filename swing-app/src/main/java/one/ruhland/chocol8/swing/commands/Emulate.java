@@ -2,6 +2,8 @@ package one.ruhland.chocol8.swing.commands;
 
 import java.io.File;
 import java.io.IOException;
+
+import one.ruhland.chocol8.chip.DefaultSound;
 import one.ruhland.chocol8.chip.Machine;
 import one.ruhland.chocol8.swing.MainWindow;
 import one.ruhland.chocol8.swing.SwingGraphics;
@@ -28,7 +30,7 @@ public class Emulate implements Callable<Void> {
 
     @Override
     public Void call() throws Exception {
-        var machine = new Machine(SwingGraphics.class);
+        var machine = new Machine(SwingGraphics.class, DefaultSound.class);
         var window = new MainWindow(machine);
         window.setVisible(true);
 

@@ -4,11 +4,11 @@ public class Timer {
 
     private static final double FREQUENCY = 60;
 
-    private Clock clock;
+    private final Clock clock;
     private byte counter = 0;
 
     Timer() {
-        clock = new Clock(FREQUENCY, () -> {
+        clock = new Clock(FREQUENCY, "TimerThread", () -> {
             if(counter != 0) {
                 counter--;
             }

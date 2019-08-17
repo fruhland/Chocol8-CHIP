@@ -2,15 +2,17 @@ package one.ruhland.chocol8.chip;
 
 public class Clock {
 
+    private double frequency;
+    private final String threadName;
     private final Runnable onTick;
 
-    private double frequency;
     private Thread clockThread;
 
     private boolean isRunning = false;
 
-    Clock(final double frequency, final Runnable onTick) {
+    Clock(final double frequency, final String threadName, final Runnable onTick) {
         this.frequency = frequency;
+        this.threadName = threadName;
         this.onTick = onTick;
     }
 
@@ -31,7 +33,7 @@ public class Clock {
                     slept = System.nanoTime() - end;
                 }
             }
-        });
+        }, threadName);
 
         clockThread.start();
     }

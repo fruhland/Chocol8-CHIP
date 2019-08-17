@@ -11,14 +11,17 @@ public class Machine {
 
     private final Memory memory;
     private final Graphics graphics;
+    private final Sound sound;
     private final Cpu cpu;
     private final Timer timer;
 
-    public Machine(final Class<? extends Graphics> graphicsClass) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+    public Machine(final Class<? extends Graphics> graphicsClass, final Class<? extends Sound> soundClass)
+            throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
         memory = new Memory();
         graphics = graphicsClass.getConstructor(int.class, int.class, Memory.class).newInstance(64, 32, memory);
+        sound = soundClass.getConstructor().newInstance();
         timer = new Timer();
-        cpu = new Cpu(memory, graphics, timer);
+        cpu = new Cpu(memory, graphics, sound, timer);
     }
 
     public void reset() {
