@@ -12,9 +12,7 @@ public abstract class Sound {
     protected Sound() {
         clock = new Clock(FREQUENCY, "SoundThread", () -> {
             if(counter != 0) {
-                if(--counter == 0) {
-                    stopBeep();
-                }
+                setCounter((byte) (counter - 1));
             }
         });
     }

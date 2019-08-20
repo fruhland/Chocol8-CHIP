@@ -32,6 +32,7 @@ public class Machine {
         cpu.reset();
         memory.reset();
         graphics.reset();
+        sound.reset();
     }
 
     public void loadProgram(final String fileName) throws IOException {
