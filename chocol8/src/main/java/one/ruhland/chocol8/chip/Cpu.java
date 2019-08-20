@@ -2,6 +2,7 @@ package one.ruhland.chocol8.chip;
 
 import java.util.Arrays;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 
 public class Cpu {
 
@@ -11,18 +12,22 @@ public class Cpu {
     private short programCounter = 0x0200;
     private short indexRegister = 0x0000;
 
+    private Keyboard.Key currentKey = null;
+
     private final Memory memory;
     private final Graphics graphics;
     private final Sound sound;
+    private final Keyboard keyboard;
     private final Timer timer;
 
     private final Clock clock;
     private final Stack stack;
 
-    Cpu(final Memory memory, final Graphics graphics, final Sound sound, final Timer timer) {
+    Cpu(final Memory memory, final Graphics graphics, final Sound sound, final Keyboard keyboard, final Timer timer) {
         this.memory = memory;
         this.graphics = graphics;
         this.sound = sound;
+        this.keyboard = keyboard;
         this.timer = timer;
 
         clock = new Clock(DEFAULT_FREQUENCY, "CpuThread", this::runCycle);
@@ -79,6 +84,12 @@ public class Cpu {
 
     private void conditionalJump(final byte operand1, final byte operand2, final BiFunction<Integer, Integer, Boolean> operator) {
         if(operator.apply(getUnsignedByte(operand1), getUnsignedByte(operand2))) {
+            incProgramCounter();
+        }
+    }
+
+    private void conditionalJump(final byte operand1, final Function<Integer, Boolean> operator) {
+        if(operator.apply(getUnsignedByte(operand1))) {
             incProgramCounter();
         }
     }
@@ -266,11 +277,40 @@ public class Cpu {
                 break;
             }
             case 0xe:
+                // 0xeX9E: Skip next instruction if key in V[X] is pressed
+                if((opcode & 0x00ff) == 0x9e) {
+                    conditionalJump(vRegisters[(opcode & 0x0f00) >> 8],
+                            operand1 -> keyboard.isKeyPressed(Keyboard.Key.fromInt(operand1)));
+                    incProgramCounter();
+                    break;
+                }
+                // 0xeXA1: Skip next instruction if key in V[X] is not pressed
+                if((opcode & 0x00ff) == 0xa1) {
+                    conditionalJump(vRegisters[(opcode & 0x0f00) >> 8],
+                            operand1 -> !keyboard.isKeyPressed(Keyboard.Key.fromInt(operand1)));
+                    incProgramCounter();
+                    break;
+                }
             case 0xf:
                 // 0xfX07: V[X] = timer
                 if((opcode & 0x00ff) == 0x07) {
                     vRegisters[(opcode & 0x0f00) >> 8] = timer.getCounter();
                     incProgramCounter();
+                    break;
+                }
+                // 0xfX0a: Wait until a key is pressed and put the pressed key in V[X]
+                if((opcode & 0x00ff) == 0x0a) {
+                    if (currentKey != null) {
+                        currentKey = keyboard.getPressedKey();
+                        break;
+                    } else {
+                        Keyboard.Key newKey = keyboard.getPressedKey();
+                        if(newKey != null) {
+                            vRegisters[(opcode & 0x0f00) >> 8] = newKey.getValue();
+                            currentKey = newKey;
+                            incProgramCounter();
+                        }
+                    }
                     break;
                 }
                 // 0xfX15: timer = V[X]

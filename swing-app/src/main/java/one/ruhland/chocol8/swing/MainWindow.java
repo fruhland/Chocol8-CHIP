@@ -31,6 +31,8 @@ public class MainWindow extends JFrame {
         setupMenu();
 
         add(((SwingGraphics) machine.getGraphics()).getPanel());
+        addKeyListener((SwingKeyboard) machine.getKeyboard());
+
         pack();
     }
 

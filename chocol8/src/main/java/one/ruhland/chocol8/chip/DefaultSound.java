@@ -23,7 +23,7 @@ public class DefaultSound extends Sound {
     }
 
     @Override
-    void startBeep() {
+    protected void startBeep() {
         isPlaying = true;
 
         new Thread(() -> {
@@ -43,7 +43,7 @@ public class DefaultSound extends Sound {
     }
 
     @Override
-    void stopBeep() {
+    protected void stopBeep() {
         isPlaying = false;
     }
 }

@@ -9,7 +9,7 @@ public abstract class Sound {
     private byte counter = 0;
     private double toneFrequency = DEFAULT_TONE_FREQUENCY;
 
-    Sound() {
+    protected Sound() {
         clock = new Clock(FREQUENCY, "SoundThread", () -> {
             if(counter != 0) {
                 if(--counter == 0) {
@@ -53,7 +53,7 @@ public abstract class Sound {
         return toneFrequency;
     }
 
-    abstract void startBeep();
+    protected abstract void startBeep();
 
-    abstract void stopBeep();
+    protected abstract void stopBeep();
 }

@@ -12,16 +12,19 @@ public class Machine {
     private final Memory memory;
     private final Graphics graphics;
     private final Sound sound;
+    private final Keyboard keyboard;
     private final Cpu cpu;
     private final Timer timer;
 
-    public Machine(final Class<? extends Graphics> graphicsClass, final Class<? extends Sound> soundClass)
-            throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+    public Machine(final Class<? extends Graphics> graphicsClass, final Class<? extends Sound> soundClass,
+                   final Class<? extends Keyboard> keyboardClass) throws NoSuchMethodException, IllegalAccessException,
+            InvocationTargetException, InstantiationException {
         memory = new Memory();
         graphics = graphicsClass.getConstructor(int.class, int.class, Memory.class).newInstance(64, 32, memory);
         sound = soundClass.getConstructor().newInstance();
+        keyboard = keyboardClass.getConstructor().newInstance();
         timer = new Timer();
-        cpu = new Cpu(memory, graphics, sound, timer);
+        cpu = new Cpu(memory, graphics, sound, keyboard, timer);
     }
 
     public void reset() {
@@ -50,6 +53,14 @@ public class Machine {
 
     public Graphics getGraphics() {
         return graphics;
+    }
+
+    public Sound getSound() {
+        return sound;
+    }
+
+    public Keyboard getKeyboard() {
+        return keyboard;
     }
 
     public Timer getTimer() {
