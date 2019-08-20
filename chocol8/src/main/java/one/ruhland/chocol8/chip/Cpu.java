@@ -251,12 +251,15 @@ public class Cpu {
                 incProgramCounter();
                 break;
             case 0xd: {
+                // 0xDXY: Draw a sprite at (V[X], V[Y]); If any pixel has been flipped from set to unset -> V[F] = 1, else V[F] = 0
                 byte x = vRegisters[(opcode & 0x0f00) >> 8];
                 byte y = vRegisters[(opcode & 0x00f0) >> 4];
                 byte height = (byte) (opcode & 0x000f);
 
                 if(graphics.drawSprite(x, y, height, indexRegister)) {
                     vRegisters[0xf] = 1;
+                } else {
+                    vRegisters[0xf] = 0;
                 }
 
                 incProgramCounter();
