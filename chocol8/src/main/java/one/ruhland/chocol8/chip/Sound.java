@@ -30,11 +30,12 @@ public abstract class Sound {
     }
 
     public void setCounter(final byte counter) {
+        byte oldCounter = this.counter;
         this.counter = counter;
 
         if(counter == 0) {
             stopBeep();
-        } else {
+        } else if(oldCounter == 0) {
             startBeep();
         }
     }
