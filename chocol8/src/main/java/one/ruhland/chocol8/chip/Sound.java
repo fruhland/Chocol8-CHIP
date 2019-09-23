@@ -10,7 +10,8 @@ public abstract class Sound {
     private double toneFrequency = DEFAULT_TONE_FREQUENCY;
 
     protected Sound() {
-        clock = new Clock(FREQUENCY, "SoundThread", () -> {
+        clock = new Clock(FREQUENCY, "SoundThread");
+        clock.addRunnable(() -> {
             if(counter != 0) {
                 setCounter((byte) (counter - 1));
             }

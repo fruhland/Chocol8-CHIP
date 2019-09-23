@@ -8,7 +8,8 @@ public class Timer {
     private byte counter = 0;
 
     Timer() {
-        clock = new Clock(FREQUENCY, "TimerThread", () -> {
+        clock = new Clock(FREQUENCY, "TimerThread");
+        clock.addRunnable(() -> {
             if(counter != 0) {
                 counter--;
             }

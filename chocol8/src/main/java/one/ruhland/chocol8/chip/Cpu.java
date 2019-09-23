@@ -30,8 +30,10 @@ public class Cpu {
         this.keyboard = keyboard;
         this.timer = timer;
 
-        clock = new Clock(DEFAULT_FREQUENCY, "CpuThread", this::runCycle);
+        clock = new Clock(DEFAULT_FREQUENCY, "CpuThread");
         stack = new Stack((byte) 16);
+
+        clock.addRunnable(this::runCycle);
     }
 
     void reset() {
@@ -62,6 +64,18 @@ public class Cpu {
 
     public Clock getClock() {
         return clock;
+    }
+
+    public byte[] getVRegisters() {
+        return vRegisters;
+    }
+
+    public short getProgramCounter() {
+        return programCounter;
+    }
+
+    public short getIndexRegister() {
+        return indexRegister;
     }
 
     private void incProgramCounter() {

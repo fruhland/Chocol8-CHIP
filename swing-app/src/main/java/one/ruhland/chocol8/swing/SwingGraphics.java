@@ -50,6 +50,10 @@ public class SwingGraphics extends Graphics {
             frameBuffer = new boolean[resolutionX * resolutionY];
         }
 
+        public int getScaleFactor() {
+            return scaleFactor;
+        }
+
         void setScaleFactor(int scaleFactor) {
             if(scaleFactor < 1) {
                 throw new IllegalArgumentException("Scale factor must be at least 1!");

@@ -39,6 +39,10 @@ public class Memory {
         System.arraycopy(FONT, 0, memory, FONT_START, FONT_SIZE);
     }
 
+    public int getSize() {
+        return memory.length;
+    }
+
     public byte getByte(final int address) {
         if(address < 0 || address >= MEMORY_SIZE) {
             throw new IllegalArgumentException(String.format("Invalid address: 0x%x", address));

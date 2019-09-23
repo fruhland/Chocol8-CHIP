@@ -4,6 +4,7 @@ import one.ruhland.chocol8.chip.Machine;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import java.awt.*;
 import java.io.IOException;
 
 public class MainWindow extends JFrame {
@@ -12,11 +13,15 @@ public class MainWindow extends JFrame {
     private static final FileNameExtensionFilter FILTER = new FileNameExtensionFilter("CHIP-8", "ch8");
 
     private final Machine machine;
+    private final SwingGraphics.GraphicsPanel graphicsPanel;
+    private final MemoryTable memoryTable;
 
     private String lastFolder;
 
     public MainWindow(final Machine machine) {
         this.machine = machine;
+        graphicsPanel = ((SwingGraphics) machine.getGraphics()).getPanel();
+        memoryTable = new MemoryTable(machine, graphicsPanel.getScaleFactor() * 2);
 
         if(!(machine.getGraphics() instanceof SwingGraphics)) {
             throw new IllegalStateException("Trying to initialize the Swing frontend with a graphics implementation " +
@@ -30,8 +35,12 @@ public class MainWindow extends JFrame {
 
         setupMenu();
 
-        add(((SwingGraphics) machine.getGraphics()).getPanel());
+        add(graphicsPanel, BorderLayout.CENTER);
+        add(memoryTable, BorderLayout.EAST);
+
         addKeyListener((SwingKeyboard) machine.getKeyboard());
+        setFocusable(true);
+        requestFocus();
 
         pack();
     }
@@ -88,7 +97,8 @@ public class MainWindow extends JFrame {
 
             var item = new JMenuItem(factor + "X");
             item.addActionListener(actionEvent -> {
-                ((SwingGraphics) machine.getGraphics()).getPanel().setScaleFactor(factor);
+                graphicsPanel.setScaleFactor(factor);
+                memoryTable.setRowCount(factor * 2);
                 pack();
             });
 
