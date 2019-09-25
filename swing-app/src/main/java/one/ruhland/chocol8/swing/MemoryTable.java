@@ -5,34 +5,31 @@ import one.ruhland.chocol8.chip.Machine;
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import java.awt.event.ActionEvent;
+import java.util.concurrent.locks.LockSupport;
 
 class MemoryTable extends JTable {
 
-    private static final int COLUMN_COUNT = 8;
-
     private final Machine machine;
 
-    private int rowCount;
-
-    MemoryTable(Machine machine, int rowCount) {
+    MemoryTable(Machine machine, int rowCount, int columnCount) {
         this.machine = machine;
-        this.rowCount = rowCount;
 
-        setModel(new MemoryTableModel());
-
-        Timer updateTimer = new Timer(100,
-                (ActionEvent e) -> ((AbstractTableModel) getModel()).fireTableDataChanged());
-        updateTimer.start();
+        setModel(new MemoryTableModel(rowCount, columnCount));
     }
 
-    void setRowCount(int rowCount) {
-        this.rowCount = rowCount;
-        setModel(new MemoryTableModel());
+    void setTableSize(int rowCount, int columnCount) {
+        setModel(new MemoryTableModel(rowCount, columnCount));
     }
 
     private final class MemoryTableModel extends AbstractTableModel {
 
-        MemoryTableModel() {}
+        private final int rowCount;
+        private final int columnCount;
+
+        MemoryTableModel(int rowCount, int columnCount) {
+            this.rowCount = rowCount;
+            this.columnCount = columnCount;
+        }
 
         @Override
         public int getRowCount() {
@@ -41,7 +38,7 @@ class MemoryTable extends JTable {
 
         @Override
         public int getColumnCount() {
-            return COLUMN_COUNT;
+            return columnCount;
         }
 
         @Override
@@ -56,14 +53,14 @@ class MemoryTable extends JTable {
 
         @Override
         public boolean isCellEditable(int row, int col) {
-            int index = machine.getCpu().getProgramCounter() + row * COLUMN_COUNT + col;
+            int index = machine.getCpu().getProgramCounter() + row * columnCount + col;
 
             return index >= 0 && index <= machine.getMemory().getSize();
         }
 
         @Override
         public Object getValueAt(int row, int col) {
-            int index = machine.getCpu().getProgramCounter() + row * COLUMN_COUNT + col;
+            int index = machine.getCpu().getProgramCounter() + row * columnCount + col;
 
             if(index < 0 || index > machine.getMemory().getSize()) {
                 return "";
@@ -74,13 +71,13 @@ class MemoryTable extends JTable {
 
         @Override
         public void setValueAt(Object o, int row, int col) {
-            int index = machine.getCpu().getProgramCounter() + row * COLUMN_COUNT + col;
+            int index = machine.getCpu().getProgramCounter() + row * columnCount + col;
 
             if(index < 0 || index > machine.getMemory().getSize()) {
                 return;
             }
 
-            machine.getMemory().setByte(machine.getCpu().getProgramCounter() + row * COLUMN_COUNT + col,
+            machine.getMemory().setByte(machine.getCpu().getProgramCounter() + row * columnCount + col,
                     (byte) Integer.parseInt(o.toString(), 16));
         }
     }

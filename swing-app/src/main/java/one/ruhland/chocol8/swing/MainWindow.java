@@ -14,14 +14,12 @@ public class MainWindow extends JFrame {
 
     private final Machine machine;
     private final SwingGraphics.GraphicsPanel graphicsPanel;
-    private final MemoryTable memoryTable;
 
     private String lastFolder;
 
     public MainWindow(final Machine machine) {
         this.machine = machine;
         graphicsPanel = ((SwingGraphics) machine.getGraphics()).getPanel();
-        memoryTable = new MemoryTable(machine, graphicsPanel.getScaleFactor() * 2);
 
         if(!(machine.getGraphics() instanceof SwingGraphics)) {
             throw new IllegalStateException("Trying to initialize the Swing frontend with a graphics implementation " +
@@ -36,7 +34,6 @@ public class MainWindow extends JFrame {
         setupMenu();
 
         add(graphicsPanel, BorderLayout.CENTER);
-        add(memoryTable, BorderLayout.EAST);
 
         addKeyListener((SwingKeyboard) machine.getKeyboard());
         setFocusable(true);
@@ -50,9 +47,11 @@ public class MainWindow extends JFrame {
 
         var fileMenu = new JMenu("File");
         var optionsMenu = new JMenu("Options");
+        var toolsMenu = new JMenu("Tools");
 
         menuBar.add(fileMenu);
         menuBar.add(optionsMenu);
+        menuBar.add(toolsMenu);
 
         // Setup file menu
         var openItem = new JMenuItem("Open");
@@ -98,7 +97,6 @@ public class MainWindow extends JFrame {
             var item = new JMenuItem(factor + "X");
             item.addActionListener(actionEvent -> {
                 graphicsPanel.setScaleFactor(factor);
-                memoryTable.setRowCount(factor * 2);
                 pack();
             });
 
@@ -124,6 +122,12 @@ public class MainWindow extends JFrame {
 
         optionsMenu.add(frequencyItem);
         optionsMenu.add(scaleMenu);
+
+        // Setup tools menu
+        var memoryItem = new JMenuItem("Memory Inspector");
+        memoryItem.addActionListener(actionEvent -> new MemoryWindow(machine).setVisible(true));
+
+        toolsMenu.add(memoryItem);
 
         setJMenuBar(menuBar);
     }
