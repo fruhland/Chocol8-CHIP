@@ -2,6 +2,7 @@ package one.ruhland.chocol8.chip;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.locks.LockSupport;
 
 public class Clock {
 
@@ -42,6 +43,7 @@ public class Clock {
 
                 long slept = 0;
                 while (sleepTime > slept) {
+                    LockSupport.parkNanos((long) (sleepTime - slept));
                     slept = System.nanoTime() - end;
                 }
             }
