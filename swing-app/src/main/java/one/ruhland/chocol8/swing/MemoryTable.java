@@ -3,9 +3,9 @@ package one.ruhland.chocol8.swing;
 import one.ruhland.chocol8.chip.Machine;
 
 import javax.swing.*;
-import javax.swing.table.AbstractTableModel;
-import java.awt.event.ActionEvent;
-import java.util.concurrent.locks.LockSupport;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
 
 class MemoryTable extends JTable {
 
@@ -15,35 +15,50 @@ class MemoryTable extends JTable {
         this.machine = machine;
 
         setModel(new MemoryTableModel(rowCount, columnCount));
+        setDefaultRenderer(String.class, new CellRenderer());
     }
 
-    void setTableSize(int rowCount, int columnCount) {
-        setModel(new MemoryTableModel(rowCount, columnCount));
+    void setRowCount(final int rowCount) {
+        ((MemoryTableModel) getModel()).setRowCount(rowCount);
     }
 
-    private final class MemoryTableModel extends AbstractTableModel {
+    void setColumnCount(final int columnCount) {
+        ((MemoryTableModel) getModel()).setColumnCount(columnCount);
+    }
 
-        private final int rowCount;
-        private final int columnCount;
+    void setAddress(int address) {
+        ((MemoryTableModel) getModel()).setStartAddress(address);
+    }
 
-        MemoryTableModel(int rowCount, int columnCount) {
-            this.rowCount = rowCount;
-            this.columnCount = columnCount;
+    private final class MemoryTableModel extends DefaultTableModel {
+
+        private int startAddress = 0;
+
+        private MemoryTableModel(int rowCount, int columnCount) {
+            super(rowCount + 1, columnCount + 1);
+        }
+
+        void setStartAddress(final int startAddress) {
+            this.startAddress = startAddress;
         }
 
         @Override
-        public int getRowCount() {
-            return rowCount;
+        public void setRowCount(int rowCount) {
+            if(rowCount > 0) {
+                super.setRowCount(rowCount);
+            }
         }
 
         @Override
-        public int getColumnCount() {
-            return columnCount;
+        public void setColumnCount(int columnCount) {
+            if(columnCount > 0) {
+                super.setColumnCount(columnCount);
+            }
         }
 
         @Override
         public String getColumnName(int i) {
-            return Integer.toHexString(i);
+            return "";
         }
 
         @Override
@@ -53,14 +68,29 @@ class MemoryTable extends JTable {
 
         @Override
         public boolean isCellEditable(int row, int col) {
-            int index = machine.getCpu().getProgramCounter() + row * columnCount + col;
+            if(row == 0 || col == 0) {
+                return false;
+            }
 
-            return index >= 0 && index <= machine.getMemory().getSize();
+            int index = startAddress + (row - 1) * (getColumnCount() - 1) + (col - 1);
+            return index >= 0 && index < machine.getMemory().getSize();
         }
 
         @Override
         public Object getValueAt(int row, int col) {
-            int index = machine.getCpu().getProgramCounter() + row * columnCount + col;
+            if(row == 0 && col == 0) {
+                return "";
+            }
+
+            if(row == 0) {
+                return String.format("%02x", col - 1);
+            }
+
+            if(col == 0) {
+                return String.format("%04x", startAddress + (row -1) * (getColumnCount() - 1));
+            }
+
+            int index = startAddress + (row - 1) * (getColumnCount() - 1) + (col - 1);
 
             if(index < 0 || index > machine.getMemory().getSize()) {
                 return "";
@@ -71,14 +101,41 @@ class MemoryTable extends JTable {
 
         @Override
         public void setValueAt(Object o, int row, int col) {
-            int index = machine.getCpu().getProgramCounter() + row * columnCount + col;
+            if(row == 0 || col == 0) {
+                return;
+            }
+
+            int index = startAddress + (row - 1) * (getColumnCount() - 1) + (col - 1);
 
             if(index < 0 || index > machine.getMemory().getSize()) {
                 return;
             }
 
-            machine.getMemory().setByte(machine.getCpu().getProgramCounter() + row * columnCount + col,
+            machine.getMemory().setByte(startAddress + (row -1) * (getColumnCount() - 1) + (col - 1),
                     (byte) Integer.parseInt(o.toString(), 16));
+        }
+    }
+
+    private static final class CellRenderer extends DefaultTableCellRenderer {
+
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int col) {
+            var ret = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, col);
+
+            if((row == 0 || col == 0) && ret instanceof JLabel) {
+                var label = (JLabel) ret;
+
+                label.setFont(label.getFont().deriveFont(Font.BOLD));
+                label.setBorder(BorderFactory.createEtchedBorder());
+                label.setBackground(Color.LIGHT_GRAY);
+                label.setHorizontalAlignment(SwingConstants.CENTER);
+            } else if(ret instanceof JLabel) {
+                var label = (JLabel) ret;
+
+                label.setBackground(Color.WHITE);
+                label.setHorizontalAlignment(SwingConstants.RIGHT);
+            }
+
+            return ret;
         }
     }
 }
