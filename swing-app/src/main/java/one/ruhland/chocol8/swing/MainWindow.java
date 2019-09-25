@@ -1,6 +1,7 @@
 package one.ruhland.chocol8.swing;
 
 import one.ruhland.chocol8.chip.Machine;
+import one.ruhland.chocol8.chip.Memory;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -14,12 +15,16 @@ public class MainWindow extends JFrame {
 
     private final Machine machine;
     private final SwingGraphics.GraphicsPanel graphicsPanel;
+    private final MemoryWindow memoryWindow;
+    private final CpuWindow cpuWindow;
 
     private String lastFolder;
 
     public MainWindow(final Machine machine) {
         this.machine = machine;
         graphicsPanel = ((SwingGraphics) machine.getGraphics()).getPanel();
+        memoryWindow = new MemoryWindow(machine);
+        cpuWindow = new CpuWindow(machine);
 
         if(!(machine.getGraphics() instanceof SwingGraphics)) {
             throw new IllegalStateException("Trying to initialize the Swing frontend with a graphics implementation " +
@@ -125,8 +130,12 @@ public class MainWindow extends JFrame {
 
         // Setup tools menu
         var memoryItem = new JMenuItem("Memory Inspector");
-        memoryItem.addActionListener(actionEvent -> new MemoryWindow(machine).setVisible(true));
+        memoryItem.addActionListener(actionEvent -> memoryWindow.setVisible(true));
 
+        var cpuItem = new JMenuItem("Cpu Controller");
+        cpuItem.addActionListener(actionEvent -> cpuWindow.setVisible(true));
+
+        toolsMenu.add(cpuItem);
         toolsMenu.add(memoryItem);
 
         setJMenuBar(menuBar);

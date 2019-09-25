@@ -10,7 +10,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.concurrent.locks.LockSupport;
 
-public class MemoryWindow extends JFrame {
+class MemoryWindow extends JFrame {
 
     private static final String WINDOW_TITLE = "Memory Inspector";
     private static final int DEFAULT_ROW_COUNT = 16;
@@ -19,13 +19,13 @@ public class MemoryWindow extends JFrame {
     private final Machine machine;
     private final MemoryTable memoryTable;
 
-    private boolean isRunning = true;
+    private boolean isRunning = false;
 
     MemoryWindow(Machine machine) {
         this.machine = machine;
         memoryTable = new MemoryTable(machine, DEFAULT_ROW_COUNT, DEFAULT_COLUMN_COUNT);
 
-        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
         setTitle(WINDOW_TITLE);
         setResizable(false);
 
@@ -34,14 +34,23 @@ public class MemoryWindow extends JFrame {
 
         pack();
 
-        new Thread(() -> {
-            while (isRunning) {
-                ((AbstractTableModel) memoryTable.getModel()).fireTableDataChanged();
-                LockSupport.parkNanos((long) ((1.0 / machine.getCpu().getClock().getFrequency()) * 1000000000));
-            }
-        }).start();
-
         addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowActivated(WindowEvent e) {
+                if(isRunning) {
+                    return;
+                }
+
+                isRunning = true;
+
+                new Thread(() -> {
+                    while (isRunning) {
+                        ((AbstractTableModel) memoryTable.getModel()).fireTableDataChanged();
+                        LockSupport.parkNanos((long) ((1.0 / machine.getCpu().getClock().getFrequency()) * 1000000000));
+                    }
+                }).start();
+            }
+
             @Override
             public void windowClosing(WindowEvent e) {
                 isRunning = false;
