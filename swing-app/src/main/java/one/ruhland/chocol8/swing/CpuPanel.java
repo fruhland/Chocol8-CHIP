@@ -5,6 +5,7 @@ import one.ruhland.chocol8.chip.Machine;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 class CpuPanel extends JPanel {
 
@@ -43,7 +44,11 @@ class CpuPanel extends JPanel {
         var frequencyPanel = new JPanel(new GridLayout(2, 2));
         var frequencyButton = new JButton("Set");
 
-        frequencyButton.addActionListener((ActionEvent e) -> {
+        ActionListener listener = (ActionEvent e) -> {
+            if(frequencyField.getText().isBlank()) {
+                return;
+            }
+
             double frequency = Double.parseDouble(frequencyField.getText().replace(',', '.'));
 
             if(frequency <= 0) {
@@ -51,7 +56,11 @@ class CpuPanel extends JPanel {
             }
 
             machine.getCpu().getClock().setFrequency(frequency);
-        });
+            frequencyField.setText("");
+        };
+
+        frequencyField.addActionListener(listener);
+        frequencyButton.addActionListener(listener);
 
         frequencyLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 
@@ -67,7 +76,11 @@ class CpuPanel extends JPanel {
         var programCounterPanel = new JPanel(new GridLayout(2, 2));
         var programCounterButton = new JButton("Set");
 
-        programCounterButton.addActionListener((ActionEvent e) -> {
+        ActionListener listener = (ActionEvent e) -> {
+            if(programCounterField.getText().isBlank()) {
+                return;
+            }
+
             short programCounter;
 
             if(programCounterField.getText().startsWith("0x")) {
@@ -85,7 +98,11 @@ class CpuPanel extends JPanel {
             }
 
             machine.getCpu().setProgramCounter(programCounter);
-        });
+            programCounterField.setText("");
+        };
+
+        programCounterField.addActionListener(listener);
+        programCounterButton.addActionListener(listener);
 
         programCounterLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 
@@ -101,7 +118,11 @@ class CpuPanel extends JPanel {
         var indexRegisterPanel = new JPanel(new GridLayout(2, 2));
         var indexRegisterButton = new JButton("Set");
 
-        indexRegisterButton.addActionListener((ActionEvent e) -> {
+        ActionListener listener = (ActionEvent e) -> {
+            if(indexRegisterField.getText().isBlank()) {
+                return;
+            }
+
             short indexRegister;
 
             if(indexRegisterField.getText().startsWith("0x")) {
@@ -115,7 +136,11 @@ class CpuPanel extends JPanel {
             }
 
             machine.getCpu().setIndexRegister(indexRegister);
-        });
+            indexRegisterField.setText("");
+        };
+
+        indexRegisterField.addActionListener(listener);
+        indexRegisterButton.addActionListener(listener);
 
         indexRegisterLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 
@@ -131,7 +156,11 @@ class CpuPanel extends JPanel {
         var timerPanel = new JPanel(new GridLayout(2, 2));
         var timerButton = new JButton("Set");
 
-        timerButton.addActionListener((ActionEvent e) -> {
+        ActionListener listener = (ActionEvent e) -> {
+            if(timerField.getText().isBlank()) {
+                return;
+            }
+
             byte timer;
 
             if(timerField.getText().startsWith("0x")) {
@@ -141,7 +170,11 @@ class CpuPanel extends JPanel {
             }
 
             machine.getTimer().setCounter(timer);
-        });
+            timerField.setText("");
+        };
+
+        timerField.addActionListener(listener);
+        timerButton.addActionListener(listener);
 
         timerLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 
@@ -157,7 +190,11 @@ class CpuPanel extends JPanel {
         var soundTimerPanel = new JPanel(new GridLayout(2, 2));
         var soundTimerButton = new JButton("Set");
 
-        soundTimerButton.addActionListener((ActionEvent e) -> {
+        ActionListener listener = (ActionEvent e) -> {
+            if(soundTimerField.getText().isBlank()) {
+                return;
+            }
+
             byte soundTimer;
 
             if(soundTimerField.getText().startsWith("0x")) {
@@ -167,7 +204,11 @@ class CpuPanel extends JPanel {
             }
 
             machine.getSound().setCounter(soundTimer);
-        });
+            soundTimerField.setText("");
+        };
+
+        soundTimerField.addActionListener(listener);
+        soundTimerButton.addActionListener(listener);
 
         soundTimerLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 
@@ -183,9 +224,17 @@ class CpuPanel extends JPanel {
         var soundFrequencyPanel = new JPanel(new GridLayout(2, 2));
         var soundFrequencyButton = new JButton("Set");
 
-        soundFrequencyButton.addActionListener((ActionEvent e) -> {
+        ActionListener listener = (ActionEvent e) -> {
+            if(soundFrequencyField.getText().isBlank()) {
+                return;
+            }
+
             machine.getSound().setToneFrequency(Integer.parseUnsignedInt(soundFrequencyField.getText()));
-        });
+            soundFrequencyField.setText("");
+        };
+
+        soundFrequencyField.addActionListener(listener);
+        soundFrequencyButton.addActionListener(listener);
 
         soundFrequencyLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 
@@ -198,11 +247,16 @@ class CpuPanel extends JPanel {
     }
     
     void refresh() {
+        int currentInstruction = ((machine.getMemory().getByte(machine.getCpu().getProgramCounter() + 1) & 0xff) |
+                ((machine.getMemory().getByte(machine.getCpu().getProgramCounter()) & 0xff) << 8));
+        int currentIndexValue = ((machine.getMemory().getByte(machine.getCpu().getIndexRegister() + 1) & 0xff) |
+                ((machine.getMemory().getByte(machine.getCpu().getIndexRegister()) & 0xff) << 8));
+
         frequencyLabel.setText(ValueFormatter.formatValue(machine.getCpu().getClock().getFrequency(), "Hz"));
-        programCounterLabel.setText(String.format("0x%04x", machine.getCpu().getProgramCounter()));
-        indexRegisterLabel.setText(String.format("0x%04x", machine.getCpu().getIndexRegister()));
-        timerLabel.setText(String.format("0x%02x", machine.getTimer().getCounter()));
-        soundTimerLabel.setText(String.format("0x%02x", machine.getSound().getCounter()));
+        programCounterLabel.setText(String.format("[%04x] = %04x", machine.getCpu().getProgramCounter(), currentInstruction));
+        indexRegisterLabel.setText(String.format("[%04x] = %04x", machine.getCpu().getIndexRegister(), currentIndexValue));
+        timerLabel.setText(String.format("%02x", machine.getTimer().getCounter()));
+        soundTimerLabel.setText(String.format("%02x", machine.getSound().getCounter()));
         soundFrequencyLabel.setText(ValueFormatter.formatValue(machine.getSound().getToneFrequency(), "Hz"));
     }
 }

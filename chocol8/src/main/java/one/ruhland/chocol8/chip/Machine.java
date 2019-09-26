@@ -16,6 +16,8 @@ public class Machine {
     private final Cpu cpu;
     private final Timer timer;
 
+    private boolean isRunning = false;
+
     public Machine(final Class<? extends Graphics> graphicsClass, final Class<? extends Sound> soundClass,
                    final Class<? extends Keyboard> keyboardClass) throws NoSuchMethodException, IllegalAccessException,
             InvocationTargetException, InstantiationException {
@@ -42,10 +44,16 @@ public class Machine {
 
     public void start() {
         cpu.start();
+        isRunning = true;
     }
 
     public void stop() {
         cpu.stop();
+        isRunning = false;
+    }
+
+    public boolean isRunning() {
+        return isRunning;
     }
 
     public Memory getMemory() {
