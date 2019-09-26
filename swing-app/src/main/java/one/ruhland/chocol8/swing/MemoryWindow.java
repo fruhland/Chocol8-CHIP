@@ -48,7 +48,7 @@ class MemoryWindow extends JFrame {
                         ((AbstractTableModel) memoryTable.getModel()).fireTableDataChanged();
                         LockSupport.parkNanos((long) ((1.0 / machine.getCpu().getClock().getFrequency()) * 1000000000));
                     }
-                }).start();
+                }, "MemoryInspectorThread").start();
             }
 
             @Override

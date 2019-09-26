@@ -14,6 +14,7 @@ class CpuWindow extends JFrame {
     private static final String WINDOW_TITLE = "Cpu Controller";
 
     private final Machine machine;
+    private final CpuPanel cpuPanel;
     private final RegisterTable registerTable;
 
     private boolean isRunning = false;
@@ -21,12 +22,17 @@ class CpuWindow extends JFrame {
     CpuWindow(Machine machine) {
         this.machine = machine;
         registerTable = new RegisterTable(machine);
+        cpuPanel = new CpuPanel(machine);
 
         setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
         setTitle(WINDOW_TITLE);
         setResizable(false);
 
-        add(registerTable, BorderLayout.CENTER);
+        var panel = new JPanel(new GridLayout(1, 2));
+        panel.add(cpuPanel);
+        panel.add(registerTable);
+
+        add(panel);
 
         pack();
 
@@ -42,9 +48,10 @@ class CpuWindow extends JFrame {
                 new Thread(() -> {
                     while (isRunning) {
                         ((AbstractTableModel) registerTable.getModel()).fireTableDataChanged();
+                        cpuPanel.refresh();
                         LockSupport.parkNanos((long) ((1.0 / machine.getCpu().getClock().getFrequency()) * 1000000000));
                     }
-                }).start();
+                }, "CpuControllerThread").start();
             }
 
             @Override

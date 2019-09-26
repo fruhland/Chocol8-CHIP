@@ -78,9 +78,7 @@ public class MainWindow extends JFrame {
         });
 
         var closeItem = new JMenuItem("Close");
-        closeItem.addActionListener(actionEvent -> {
-            machine.reset();
-        });
+        closeItem.addActionListener(actionEvent -> machine.reset());
 
         var exitItem = new JMenuItem("Exit");
         exitItem.addActionListener(actionEvent -> {
@@ -107,25 +105,7 @@ public class MainWindow extends JFrame {
 
             scaleMenu.add(item);
         }
-        
-        var frequencyItem = new JMenuItem("CPU frequency");
-        frequencyItem.addActionListener(actionEvent -> {
-            var string = JOptionPane.showInputDialog(null, "Please enter the desired frequency in Hz (1-1000000):");
 
-            if(string == null || string.isEmpty()) {
-                return;
-            }
-
-            var frequency = Integer.parseInt(string);
-
-            if (frequency < 1 || frequency > 1000000) {
-                throw new IllegalArgumentException("Frequency must be between 1 and 1000000 Hz!");
-            }
-
-            machine.getCpu().getClock().setFrequency(frequency);
-        });
-
-        optionsMenu.add(frequencyItem);
         optionsMenu.add(scaleMenu);
 
         // Setup tools menu
