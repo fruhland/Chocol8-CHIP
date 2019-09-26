@@ -45,13 +45,9 @@ public abstract class Sound {
         return counter;
     }
 
-    public void setFrequency(final double toneFrequency) {
-        this.toneFrequency = toneFrequency;
-    }
+    public abstract void setToneFrequency(final double toneFrequency);
 
-    public double getFrequency() {
-        return toneFrequency;
-    }
+    public abstract double getToneFrequency();
 
     protected abstract void startBeep();
 

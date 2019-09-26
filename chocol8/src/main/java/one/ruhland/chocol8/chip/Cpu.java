@@ -78,6 +78,18 @@ public class Cpu {
         return indexRegister;
     }
 
+    public void setProgramCounter(short programCounter) {
+        this.programCounter = programCounter;
+    }
+
+    public void setIndexRegister(short indexRegister) {
+        this.indexRegister = indexRegister;
+    }
+
+    public void setCurrentKey(Keyboard.Key currentKey) {
+        this.currentKey = currentKey;
+    }
+
     private void incProgramCounter() {
         jumpToAddress((short) (programCounter + 2));
     }
