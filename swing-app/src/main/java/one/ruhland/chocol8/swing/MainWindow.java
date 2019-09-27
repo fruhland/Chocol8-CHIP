@@ -1,7 +1,6 @@
 package one.ruhland.chocol8.swing;
 
 import one.ruhland.chocol8.chip.Machine;
-import one.ruhland.chocol8.chip.Memory;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;

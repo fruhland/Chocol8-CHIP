@@ -66,6 +66,10 @@ public class Cpu {
         return clock;
     }
 
+    public Stack getStack() {
+        return stack;
+    }
+
     public byte[] getVRegisters() {
         return vRegisters;
     }

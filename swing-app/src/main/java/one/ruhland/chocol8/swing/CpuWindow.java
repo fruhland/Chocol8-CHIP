@@ -15,6 +15,7 @@ class CpuWindow extends JFrame {
 
     private final CpuPanel cpuPanel;
     private final RegisterTable registerTable;
+    private final StackTable stackTable;
     private final CpuControlPanel controlPanel;
 
     private boolean isRunning = false;
@@ -22,18 +23,21 @@ class CpuWindow extends JFrame {
     CpuWindow(Machine machine) {
         registerTable = new RegisterTable(machine);
         cpuPanel = new CpuPanel(machine);
+        stackTable = new StackTable(machine);
         controlPanel = new CpuControlPanel(machine);
 
         setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
         setTitle(WINDOW_TITLE);
         setResizable(false);
 
-        var gridPanel = new JPanel(new GridLayout(1, 2));
+        var gridPanel = new JPanel(new GridLayout(1, 3));
 
         gridPanel.add(cpuPanel);
         gridPanel.add(registerTable);
+        gridPanel.add(stackTable);
 
         registerTable.setRowHeight(20);
+        stackTable.setRowHeight(20);
 
         add(gridPanel, BorderLayout.CENTER);
         add(controlPanel, BorderLayout.SOUTH);
@@ -52,6 +56,7 @@ class CpuWindow extends JFrame {
                 new Thread(() -> {
                     while (isRunning) {
                         ((AbstractTableModel) registerTable.getModel()).fireTableDataChanged();
+                        ((AbstractTableModel) stackTable.getModel()).fireTableDataChanged();
                         cpuPanel.refresh();
                         controlPanel.refresh();
 
