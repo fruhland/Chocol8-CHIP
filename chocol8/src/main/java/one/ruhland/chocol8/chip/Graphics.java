@@ -28,7 +28,6 @@ public abstract class Graphics {
             }
         }
 
-        flush();
         return flippedFromSetToUnset;
     }
 
@@ -43,6 +42,4 @@ public abstract class Graphics {
     protected abstract boolean flipPixel(final int x, final int y);
 
     protected abstract void reset();
-
-    protected abstract void flush();
 }

@@ -6,18 +6,28 @@ import one.ruhland.chocol8.chip.Memory;
 import javax.swing.*;
 import java.awt.*;
 import java.util.Arrays;
+import java.util.concurrent.locks.LockSupport;
 
 public class SwingGraphics extends Graphics {
 
+    private final static int DEFAULT_FRAMES_PER_SECOND = 60;
+
     private final GraphicsPanel panel;
+    private final RepaintThread repaintThread = new RepaintThread(DEFAULT_FRAMES_PER_SECOND);
 
     public SwingGraphics(final int resolutionX, final int resolutionY, final Memory memory) {
         super(resolutionX, resolutionY, memory);
         panel = new GraphicsPanel(resolutionX, resolutionY);
+
+        repaintThread.start();
     }
 
     GraphicsPanel getPanel() {
         return panel;
+    }
+
+    void setFramesPerSecond(int framesPerSecond) {
+        repaintThread.setFramesPerSecond(framesPerSecond);
     }
 
     @Override
@@ -28,11 +38,6 @@ public class SwingGraphics extends Graphics {
     @Override
     protected void reset() {
         panel.reset();
-    }
-
-    @Override
-    protected void flush() {
-        panel.repaint();
     }
 
     static final class GraphicsPanel extends JPanel {
@@ -94,6 +99,44 @@ public class SwingGraphics extends Graphics {
                     g.fillRect(i * scaleFactor, j * scaleFactor, scaleFactor, scaleFactor);
                 }
             }
+        }
+    }
+
+    private final class RepaintThread extends Thread {
+
+        private int framesPerSecond;
+        private boolean isRunning = true;
+
+        RepaintThread(int framesPerSecond) {
+            super("RepaintThread");
+            this.framesPerSecond = framesPerSecond;
+        }
+
+        @Override
+        public void run() {
+            while(isRunning) {
+                long start = System.nanoTime();
+                long frameTime = 1000000000L / framesPerSecond;
+
+                panel.repaint();
+
+                long end = System.nanoTime();
+                long sleepTime = frameTime - (end - start);
+
+                long slept = 0;
+                while (sleepTime > slept) {
+                    LockSupport.parkNanos(sleepTime - slept);
+                    slept = System.nanoTime() - end;
+                }
+            }
+        }
+
+        void setFramesPerSecond(int framesPerSecond) {
+            this.framesPerSecond = framesPerSecond;
+        }
+
+        void exit() {
+            isRunning = false;
         }
     }
 }
