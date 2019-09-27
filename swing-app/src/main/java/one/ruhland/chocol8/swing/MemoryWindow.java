@@ -6,6 +6,7 @@ import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.concurrent.locks.LockSupport;
@@ -65,8 +66,8 @@ class MemoryWindow extends JFrame {
         var rowPanel = new JPanel(new FlowLayout());
         var colPanel = new JPanel(new FlowLayout());
 
-        var addressInput = new JTextField(8);
-        var setButton = new JButton("Set Address");
+        var addressField = new JTextField(8);
+        var setAddressButton = new JButton("Set Address");
 
         var addRowButton = new JButton("+");
         var removeRowButton = new JButton("-");
@@ -90,22 +91,26 @@ class MemoryWindow extends JFrame {
             pack();
         });
 
-        setButton.addActionListener((ActionEvent e) -> {
+        ActionListener setAddressListener = (ActionEvent e) -> {
             int address;
 
-            if (addressInput.getText().startsWith("0x")) {
-                address = Integer.parseUnsignedInt(addressInput.getText().substring(2), 16);
+            if (addressField.getText().startsWith("0x")) {
+                address = Integer.parseUnsignedInt(addressField.getText().substring(2), 16);
             } else {
-                address = Integer.parseUnsignedInt(addressInput.getText(), 10);
+                address = Integer.parseUnsignedInt(addressField.getText(), 10);
             }
 
             if(address > 0 && address < machine.getMemory().getSize()) {
                 memoryTable.setAddress(address);
+                addressField.setText("");
             }
-        });
+        };
 
-        addressPanel.add(addressInput);
-        addressPanel.add(setButton);
+        setAddressButton.addActionListener(setAddressListener);
+        addressField.addActionListener(setAddressListener);
+
+        addressPanel.add(addressField);
+        addressPanel.add(setAddressButton);
 
         rowPanel.add(new JLabel("Rows:"));
         rowPanel.add(addRowButton);
