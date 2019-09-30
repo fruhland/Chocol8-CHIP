@@ -2,6 +2,7 @@ package one.ruhland.chocol8.swing;
 
 import one.ruhland.chocol8.chip.Machine;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
@@ -34,6 +35,14 @@ public class MainWindow extends JFrame {
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setTitle(WINDOW_TITLE);
         setResizable(false);
+
+        var iconStream = MainWindow.class.getClassLoader().getResourceAsStream("icon.png");
+
+        if(iconStream != null) {
+            try {
+                setIconImage(ImageIO.read(iconStream));
+            } catch (IOException ignored) {}
+        }
 
         setupMenu();
 

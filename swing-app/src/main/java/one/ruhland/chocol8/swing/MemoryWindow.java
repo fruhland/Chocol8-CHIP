@@ -2,6 +2,7 @@ package one.ruhland.chocol8.swing;
 
 import one.ruhland.chocol8.chip.Machine;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import java.awt.*;
@@ -9,6 +10,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.IOException;
 import java.util.concurrent.locks.LockSupport;
 
 class MemoryWindow extends JFrame {
@@ -29,6 +31,14 @@ class MemoryWindow extends JFrame {
         setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
         setTitle(WINDOW_TITLE);
         setResizable(false);
+
+        var iconStream = MainWindow.class.getClassLoader().getResourceAsStream("icon.png");
+
+        if(iconStream != null) {
+            try {
+                setIconImage(ImageIO.read(iconStream));
+            } catch (IOException ignored) {}
+        }
 
         add(memoryTable, BorderLayout.CENTER);
         setupOptionsPanel();
