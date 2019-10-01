@@ -239,10 +239,10 @@ public class Cpu {
                     incProgramCounter();
                     break;
                 }
-                // 0x8XY6: V[X] >>= 1; V[F] = LSB(V[X])
+                // 0x8XY6: V[X] = V[Y] >> 1; V[F] = LSB(V[Y])
                 else if((opcode & 0x000f) == 0x6) {
-                    vRegisters[0xf] = (byte) (vRegisters[(opcode & 0x0f00) >> 8] & 0x01);
-                    vRegisters[(opcode & 0x0f00) >> 8] >>= 1;
+                    vRegisters[0xf] = (byte) (vRegisters[(opcode & 0x00f0) >> 4] & 0x01);
+                    vRegisters[(opcode & 0x0f00) >> 8] = (byte) (vRegisters[(opcode & 0x00f0) >> 4] >> 1);
                     incProgramCounter();
                     break;
                 }
@@ -259,8 +259,8 @@ public class Cpu {
                 }
                 // 0x8XYE: V[X] <<= 1; V[F] = MSB(V[X])
                 else if((opcode & 0x000f) == 0xe) {
-                    vRegisters[0xf] = (byte) (vRegisters[(opcode & 0x0f00) >> 8] & 0x80);
-                    vRegisters[(opcode & 0x0f00) >> 8] <<= 1;
+                    vRegisters[0xf] = (byte) (vRegisters[(opcode & 0x00f0) >> 4] & 0x80);
+                    vRegisters[(opcode & 0x0f00) >> 8] = (byte) (vRegisters[(opcode & 0x00f0) >> 4] << 1);
                     incProgramCounter();
                     break;
                 } else {
@@ -297,11 +297,7 @@ public class Cpu {
                 byte y = vRegisters[(opcode & 0x00f0) >> 4];
                 byte height = (byte) (opcode & 0x000f);
 
-                if(graphics.drawSprite(x, y, height, indexRegister)) {
-                    vRegisters[0xf] = 1;
-                } else {
-                    vRegisters[0xf] = 0;
-                }
+                vRegisters[0xf] = (byte) (graphics.drawSprite(x, y, height, indexRegister) ? 1 : 0);
 
                 incProgramCounter();
                 break;
