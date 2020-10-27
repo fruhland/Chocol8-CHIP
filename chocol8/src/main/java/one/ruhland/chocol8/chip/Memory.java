@@ -30,13 +30,13 @@ public class Memory {
             (byte) 0xf0, (byte) 0x80, (byte) 0xf0, (byte) 0x80, (byte) 0x80  // F
     };
     
-    private byte[] memory = new byte[MEMORY_SIZE];
+    private final byte[] memory = new byte[MEMORY_SIZE];
     
     Memory() {}
 
     void reset() {
         Arrays.fill(memory, (byte) 0);
-        System.arraycopy(FONT, 0, memory, FONT_START, FONT_SIZE);
+        setBytes(FONT_START, FONT);
     }
 
     public int getSize() {
@@ -45,7 +45,7 @@ public class Memory {
 
     public byte getByte(final int address) {
         if(address < 0 || address >= MEMORY_SIZE) {
-            throw new IllegalArgumentException(String.format("Invalid address: 0x%x", address));
+            throw new IndexOutOfBoundsException(String.format("Invalid address: 0x%x", address));
         }
 
         return memory[address];
@@ -53,7 +53,7 @@ public class Memory {
 
     public void setByte(final int address, final byte value) {
         if(address < 0 || address >= MEMORY_SIZE) {
-            throw new IllegalArgumentException(String.format("Invalid address: 0x%x", address));
+            throw new IndexOutOfBoundsException(String.format("Invalid address: 0x%x", address));
         }
 
         memory[address] = value;
@@ -61,7 +61,7 @@ public class Memory {
 
     public void setBytes(final int address, final byte[] bytes) {
         if(address < 0 || address + bytes.length >= MEMORY_SIZE) {
-            throw new IllegalArgumentException(String.format("Invalid address: 0x%x (Size: 0x%x)", address, bytes.length));
+            throw new IndexOutOfBoundsException(String.format("Invalid address: 0x%x (Size: 0x%x)", address, bytes.length));
         }
 
         System.arraycopy(bytes, 0, memory, address, bytes.length);

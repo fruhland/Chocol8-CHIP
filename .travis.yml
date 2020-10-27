@@ -7,7 +7,9 @@ stages:
 jobs:
   include:
     - stage: build
-      script: ./gradlew chocol8:jar swing-app:distZip
+      script:
+        - ./gradlew check
+        - ./gradlew chocol8:jar swing-app:distZip
 
 before_deploy:
   - export CHOCOL8_JAR_FILE=$(ls build/chocol8/libs/*.jar)
