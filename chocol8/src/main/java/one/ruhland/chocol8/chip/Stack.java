@@ -10,7 +10,7 @@ public class Stack {
     Stack() {}
 
     void push(final short value) {
-        if(stackPointer >= stack.length) {
+        if (stackPointer >= stack.length) {
             throw new IllegalStateException("Trying to push to full stack (Stack size: " + stack.length + ")!");
         }
 
@@ -18,7 +18,7 @@ public class Stack {
     }
 
     short pop() {
-        if(stackPointer <= 0) {
+        if (stackPointer <= 0) {
             throw new IllegalStateException("Trying to pop from empty stack!");
         }
 
@@ -35,7 +35,7 @@ public class Stack {
     }
 
     public short peekAt(int index) {
-        if(index < 0 || index >= stack.length) {
+        if (index < 0 || index >= stack.length) {
             throw new IndexOutOfBoundsException("Trying to peek at index " + index + " (Stack size: " + stack.length + ")!");
         }
 
@@ -43,7 +43,7 @@ public class Stack {
     }
 
     public void setAt(int index, short value) {
-        if(index < 0 || index >= stack.length) {
+        if (index < 0 || index >= stack.length) {
             throw new IndexOutOfBoundsException("Trying to set value at index " + index + " (Stack size: " + stack.length + ")!");
         }
 

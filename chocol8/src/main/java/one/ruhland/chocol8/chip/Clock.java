@@ -31,10 +31,10 @@ public class Clock {
         isRunning = true;
 
         clockThread = new Thread(() -> {
-            while(isRunning) {
+            while (isRunning) {
                 long start = System.nanoTime();
 
-                for(Runnable runnable : onTick) {
+                for (Runnable runnable : onTick) {
                     runnable.run();
                 }
 
@@ -55,7 +55,7 @@ public class Clock {
     void stop() {
         isRunning = false;
 
-        if(clockThread == null) {
+        if (clockThread == null) {
             return;
         }
 

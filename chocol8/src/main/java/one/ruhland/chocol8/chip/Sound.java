@@ -12,7 +12,7 @@ public abstract class Sound {
     protected Sound() {
         clock = new Clock(FREQUENCY, "SoundThread");
         clock.addRunnable(() -> {
-            if(counter != 0) {
+            if (counter != 0) {
                 setCounter((byte) (counter - 1));
             }
         });
@@ -34,9 +34,9 @@ public abstract class Sound {
         byte oldCounter = this.counter;
         this.counter = counter;
 
-        if(counter == 0) {
+        if (counter == 0) {
             stopBeep();
-        } else if(oldCounter == 0) {
+        } else if (oldCounter == 0) {
             startBeep();
         }
     }

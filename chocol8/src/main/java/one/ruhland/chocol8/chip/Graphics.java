@@ -16,12 +16,12 @@ public abstract class Graphics {
     boolean drawSprite(final int x, final int y, final int height, final int address) {
         boolean flippedFromSetToUnset = false;
 
-        for(int i = 0; i < height; i++) {
+        for (int i = 0; i < height; i++) {
             byte currentLine = memory.getByte(address + i);
 
-            for(int j = 0; j < 8; j++) {
-                if((currentLine & (1 << (7 - j))) > 0) {
-                    if(flipPixel(x + j, y + i)) {
+            for (int j = 0; j < 8; j++) {
+                if ((currentLine & (1 << (7 - j))) > 0) {
+                    if (flipPixel(x + j, y + i)) {
                         flippedFromSetToUnset = true;
                     }
                 }

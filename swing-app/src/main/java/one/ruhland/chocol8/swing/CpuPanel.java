@@ -45,13 +45,13 @@ class CpuPanel extends JPanel {
         var frequencyButton = new JButton("Set");
 
         ActionListener listener = (ActionEvent e) -> {
-            if(frequencyField.getText().isBlank()) {
+            if (frequencyField.getText().isBlank()) {
                 return;
             }
 
             double frequency = Double.parseDouble(frequencyField.getText().replace(',', '.'));
 
-            if(frequency <= 0) {
+            if (frequency <= 0) {
                 frequency = 1;
             }
 
@@ -77,23 +77,23 @@ class CpuPanel extends JPanel {
         var programCounterButton = new JButton("Set");
 
         ActionListener listener = (ActionEvent e) -> {
-            if(programCounterField.getText().isBlank()) {
+            if (programCounterField.getText().isBlank()) {
                 return;
             }
 
             short programCounter;
 
-            if(programCounterField.getText().startsWith("0x")) {
+            if (programCounterField.getText().startsWith("0x")) {
                 programCounter = (short) Integer.parseUnsignedInt(programCounterField.getText().substring(2), 16);
             } else {
                 programCounter = (short) Integer.parseUnsignedInt(programCounterField.getText(), 10);
             }
 
-            if(programCounter < 0) {
+            if (programCounter < 0) {
                 programCounter = 0;
             }
 
-            if(programCounter > machine.getMemory().getSize()) {
+            if (programCounter > machine.getMemory().getSize()) {
                 programCounter = (short) (machine.getMemory().getSize() - 1);
             }
 
@@ -119,19 +119,19 @@ class CpuPanel extends JPanel {
         var indexRegisterButton = new JButton("Set");
 
         ActionListener listener = (ActionEvent e) -> {
-            if(indexRegisterField.getText().isBlank()) {
+            if (indexRegisterField.getText().isBlank()) {
                 return;
             }
 
             short indexRegister;
 
-            if(indexRegisterField.getText().startsWith("0x")) {
+            if (indexRegisterField.getText().startsWith("0x")) {
                 indexRegister = (short) Integer.parseUnsignedInt(indexRegisterField.getText().substring(2), 16);
             } else {
                 indexRegister = (short) Integer.parseUnsignedInt(indexRegisterField.getText(), 10);
             }
 
-            if(indexRegister > machine.getMemory().getSize()) {
+            if (indexRegister > machine.getMemory().getSize()) {
                 indexRegister = (short) (machine.getMemory().getSize() - 1);
             }
 
@@ -157,13 +157,13 @@ class CpuPanel extends JPanel {
         var timerButton = new JButton("Set");
 
         ActionListener listener = (ActionEvent e) -> {
-            if(timerField.getText().isBlank()) {
+            if (timerField.getText().isBlank()) {
                 return;
             }
 
             byte timer;
 
-            if(timerField.getText().startsWith("0x")) {
+            if (timerField.getText().startsWith("0x")) {
                 timer = (byte) Integer.parseUnsignedInt(timerField.getText().substring(2), 16);
             } else {
                 timer = (byte) Integer.parseUnsignedInt(timerField.getText(), 10);
@@ -191,13 +191,13 @@ class CpuPanel extends JPanel {
         var soundTimerButton = new JButton("Set");
 
         ActionListener listener = (ActionEvent e) -> {
-            if(soundTimerField.getText().isBlank()) {
+            if (soundTimerField.getText().isBlank()) {
                 return;
             }
 
             byte soundTimer;
 
-            if(soundTimerField.getText().startsWith("0x")) {
+            if (soundTimerField.getText().startsWith("0x")) {
                 soundTimer = (byte) Integer.parseUnsignedInt(soundTimerField.getText().substring(2), 16);
             } else {
                 soundTimer = (byte) Integer.parseUnsignedInt(soundTimerField.getText(), 10);
@@ -225,7 +225,7 @@ class CpuPanel extends JPanel {
         var soundFrequencyButton = new JButton("Set");
 
         ActionListener listener = (ActionEvent e) -> {
-            if(soundFrequencyField.getText().isBlank()) {
+            if (soundFrequencyField.getText().isBlank()) {
                 return;
             }
 

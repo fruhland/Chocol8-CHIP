@@ -24,7 +24,7 @@ public class DefaultSound extends Sound {
         this.toneFrequency = toneFrequency;
         List<Byte> audioData = new ArrayList<>();
 
-        for(double i = 0; i < 0.1; i += (1.0 / SAMPLE_RATE)) {
+        for (double i = 0; i < 0.1; i += (1.0 / SAMPLE_RATE)) {
             audioData.add((byte) (Math.sin(2 * Math.PI * toneFrequency * i) * 127));
         }
 
@@ -33,7 +33,7 @@ public class DefaultSound extends Sound {
         try {
             byte[] audioArray = new byte[audioData.size()];
 
-            for(int i = 0; i < audioArray.length; i++) {
+            for (int i = 0; i < audioArray.length; i++) {
                 audioArray[i] = audioData.get(i);
             }
 
@@ -51,14 +51,14 @@ public class DefaultSound extends Sound {
 
     @Override
     protected void startBeep() {
-        if(isPlaying) {
+        if (isPlaying) {
             return;
         }
 
         isPlaying = true;
 
         new Thread(() -> {
-            while(isPlaying) {
+            while (isPlaying) {
                 clip.loop(1);
             }
 

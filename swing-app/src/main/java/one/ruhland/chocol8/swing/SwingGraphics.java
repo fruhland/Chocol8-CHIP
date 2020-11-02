@@ -60,7 +60,7 @@ public class SwingGraphics extends Graphics {
         }
 
         void setScaleFactor(int scaleFactor) {
-            if(scaleFactor < 1) {
+            if (scaleFactor < 1) {
                 throw new IllegalArgumentException("Scale factor must be at least 1!");
             }
 
@@ -71,7 +71,7 @@ public class SwingGraphics extends Graphics {
         boolean flipPixel(int x, int y) {
             int pos = x + y * resolutionX;
 
-            if(pos < 0 || pos >= frameBuffer.length) {
+            if (pos < 0 || pos >= frameBuffer.length) {
                 return false;
             }
 
@@ -93,8 +93,8 @@ public class SwingGraphics extends Graphics {
         protected void paintComponent(java.awt.Graphics g) {
             super.paintComponent(g);
 
-            for(int i = 0; i < resolutionX; i++) {
-                for(int j = 0; j < resolutionY; j++) {
+            for (int i = 0; i < resolutionX; i++) {
+                for (int j = 0; j < resolutionY; j++) {
                     g.setColor(frameBuffer[i + j * resolutionX] ? Color.BLACK : Color.WHITE);
                     g.fillRect(i * scaleFactor, j * scaleFactor, scaleFactor, scaleFactor);
                 }
@@ -114,7 +114,7 @@ public class SwingGraphics extends Graphics {
 
         @Override
         public void run() {
-            while(isRunning) {
+            while (isRunning) {
                 long start = System.nanoTime();
                 long frameTime = 1000000000L / framesPerSecond;
 

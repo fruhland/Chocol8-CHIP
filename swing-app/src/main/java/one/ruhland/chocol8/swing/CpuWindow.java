@@ -34,7 +34,7 @@ class CpuWindow extends JFrame {
 
         var iconStream = MainWindow.class.getClassLoader().getResourceAsStream("icon.png");
 
-        if(iconStream != null) {
+        if (iconStream != null) {
             try {
                 setIconImage(ImageIO.read(iconStream));
             } catch (IOException ignored) {}
@@ -57,7 +57,7 @@ class CpuWindow extends JFrame {
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowActivated(WindowEvent e) {
-                if(isRunning) {
+                if (isRunning) {
                     return;
                 }
 
@@ -72,7 +72,7 @@ class CpuWindow extends JFrame {
 
                         long sleepTime = (long) ((1.0 / machine.getCpu().getClock().getFrequency()) * 1000000000);
 
-                        if(sleepTime > 100000000L) {
+                        if (sleepTime > 100000000L) {
                             sleepTime = 100000000L;
                         }
 

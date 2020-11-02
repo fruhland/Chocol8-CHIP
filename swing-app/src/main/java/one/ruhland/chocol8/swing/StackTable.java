@@ -47,11 +47,11 @@ class StackTable extends JTable {
 
         @Override
         public Object getValueAt(int row, int col) {
-            if(col == 0) {
+            if (col == 0) {
                 return String.format("%x", row);
             }
 
-            if(col >= machine.getCpu().getVRegisters().length) {
+            if (col >= machine.getCpu().getVRegisters().length) {
                 return "";
             }
 
@@ -60,7 +60,7 @@ class StackTable extends JTable {
 
         @Override
         public void setValueAt(Object o, int row, int col) {
-            if(col == 0 || col >= machine.getCpu().getVRegisters().length) {
+            if (col == 0 || col >= machine.getCpu().getVRegisters().length) {
                 return;
             }
 
@@ -73,14 +73,14 @@ class StackTable extends JTable {
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int col) {
             var ret = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, col);
 
-            if((col == 0) && ret instanceof JLabel) {
+            if ((col == 0) && ret instanceof JLabel) {
                 var label = (JLabel) ret;
 
                 label.setFont(label.getFont().deriveFont(Font.BOLD));
                 label.setBorder(BorderFactory.createEtchedBorder());
                 label.setBackground(Color.LIGHT_GRAY);
                 label.setHorizontalAlignment(SwingConstants.CENTER);
-            } else if(ret instanceof JLabel) {
+            } else if (ret instanceof JLabel) {
                 var label = (JLabel) ret;
 
                 label.setBackground(Color.WHITE);

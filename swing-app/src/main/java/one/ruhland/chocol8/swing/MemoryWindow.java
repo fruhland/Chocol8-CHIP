@@ -34,7 +34,7 @@ class MemoryWindow extends JFrame {
 
         var iconStream = MainWindow.class.getClassLoader().getResourceAsStream("icon.png");
 
-        if(iconStream != null) {
+        if (iconStream != null) {
             try {
                 setIconImage(ImageIO.read(iconStream));
             } catch (IOException ignored) {}
@@ -48,7 +48,7 @@ class MemoryWindow extends JFrame {
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowActivated(WindowEvent e) {
-                if(isRunning) {
+                if (isRunning) {
                     return;
                 }
 
@@ -110,7 +110,7 @@ class MemoryWindow extends JFrame {
                 address = Integer.parseUnsignedInt(addressField.getText(), 10);
             }
 
-            if(address > 0 && address < machine.getMemory().getSize()) {
+            if (address > 0 && address < machine.getMemory().getSize()) {
                 memoryTable.setAddress(address);
                 addressField.setText("");
             }

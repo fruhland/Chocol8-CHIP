@@ -10,7 +10,7 @@ public class Timer {
     Timer() {
         clock = new Clock(FREQUENCY, "TimerThread");
         clock.addRunnable(() -> {
-            if(counter != 0) {
+            if (counter != 0) {
                 counter--;
             }
         });

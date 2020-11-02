@@ -26,7 +26,7 @@ public class MainWindow extends JFrame {
         memoryWindow = new MemoryWindow(machine);
         cpuWindow = new CpuWindow(machine);
 
-        if(!(machine.getGraphics() instanceof SwingGraphics)) {
+        if (!(machine.getGraphics() instanceof SwingGraphics)) {
             throw new IllegalStateException("Trying to initialize the Swing frontend with a graphics implementation " +
                     "of type " + machine.getGraphics().getClass().getCanonicalName() + "! " +
                     "This frontend only works with " + SwingGraphics.class.getCanonicalName() + "!");
@@ -38,7 +38,7 @@ public class MainWindow extends JFrame {
 
         var iconStream = MainWindow.class.getClassLoader().getResourceAsStream("icon.png");
 
-        if(iconStream != null) {
+        if (iconStream != null) {
             try {
                 setIconImage(ImageIO.read(iconStream));
             } catch (IOException ignored) {}
@@ -75,7 +75,7 @@ public class MainWindow extends JFrame {
             int ret = chooser.showOpenDialog(this);
             lastFolder = chooser.getCurrentDirectory().getAbsolutePath();
 
-            if(ret == JFileChooser.APPROVE_OPTION) {
+            if (ret == JFileChooser.APPROVE_OPTION) {
                 try {
                     machine.loadProgram(chooser.getSelectedFile().getAbsolutePath());
                     machine.start();
@@ -102,7 +102,7 @@ public class MainWindow extends JFrame {
         // Setup options menu
         var scaleMenu = new JMenu("Scale factor");
 
-        for(int i = 1; i <= 16; i++) {
+        for (int i = 1; i <= 16; i++) {
             final int factor = i;
 
             var item = new JMenuItem(factor + "X");

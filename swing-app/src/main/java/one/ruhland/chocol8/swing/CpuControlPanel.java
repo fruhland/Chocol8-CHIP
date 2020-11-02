@@ -21,7 +21,7 @@ class CpuControlPanel extends JPanel {
         });
 
         playPauseButton.addActionListener((ActionEvent e) -> {
-            if(machine.isRunning()) {
+            if (machine.isRunning()) {
                 machine.stop();
             } else {
                 machine.start();
@@ -29,7 +29,7 @@ class CpuControlPanel extends JPanel {
         });
 
         nextButton.addActionListener((ActionEvent e) -> {
-            if(!machine.isRunning()) {
+            if (!machine.isRunning()) {
                 machine.getCpu().runCycle();
             }
         });

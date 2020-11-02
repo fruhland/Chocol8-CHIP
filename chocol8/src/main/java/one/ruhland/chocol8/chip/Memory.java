@@ -44,7 +44,7 @@ public class Memory {
     }
 
     public byte getByte(final int address) {
-        if(address < 0 || address >= MEMORY_SIZE) {
+        if (address < 0 || address >= MEMORY_SIZE) {
             throw new IndexOutOfBoundsException(String.format("Invalid address: 0x%x", address));
         }
 
@@ -52,7 +52,7 @@ public class Memory {
     }
 
     public void setByte(final int address, final byte value) {
-        if(address < 0 || address >= MEMORY_SIZE) {
+        if (address < 0 || address >= MEMORY_SIZE) {
             throw new IndexOutOfBoundsException(String.format("Invalid address: 0x%x", address));
         }
 
@@ -60,7 +60,7 @@ public class Memory {
     }
 
     public void setBytes(final int address, final byte[] bytes) {
-        if(address < 0 || address + bytes.length >= MEMORY_SIZE) {
+        if (address < 0 || address + bytes.length >= MEMORY_SIZE) {
             throw new IndexOutOfBoundsException(String.format("Invalid address: 0x%x (Size: 0x%x)", address, bytes.length));
         }
 

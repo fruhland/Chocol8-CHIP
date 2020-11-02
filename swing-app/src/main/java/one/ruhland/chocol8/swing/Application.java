@@ -40,7 +40,7 @@ public class Application implements Runnable {
 
         machine.getCpu().getClock().setFrequency(cpuFrequency);
 
-        if(romPath != null) {
+        if (romPath != null) {
             try {
                 machine.loadProgram(romPath);
                 window.setTitle(window.getTitle() + " - " + new File(romPath).getName());
