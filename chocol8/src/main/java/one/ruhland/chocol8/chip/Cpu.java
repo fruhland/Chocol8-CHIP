@@ -8,7 +8,7 @@ public class Cpu {
 
     private static final double DEFAULT_FREQUENCY = 1000;
 
-    private byte[] vRegisters = new byte[0x10];
+    private final byte[] vRegisters = new byte[0x10];
     private short programCounter = 0x0200;
     private short indexRegister = 0x0000;
 
@@ -45,15 +45,11 @@ public class Cpu {
     }
 
     void start() {
-        timer.start();
-        sound.start();
         clock.start();
     }
 
     void stop() {
         clock.stop();
-        sound.stop();
-        timer.stop();
     }
 
     public void runCycle() {

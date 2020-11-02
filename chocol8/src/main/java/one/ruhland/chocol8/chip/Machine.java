@@ -9,23 +9,27 @@ import one.ruhland.chocol8.generated.BuildConfig;
 
 public class Machine {
 
+    private static final double CLOCK_FREQUENCY = 60;
+
+    private final Clock clock;
     private final Memory memory;
     private final Graphics graphics;
     private final Sound sound;
+    private final Timer timer;
     private final Keyboard keyboard;
     private final Cpu cpu;
-    private final Timer timer;
 
     private boolean isRunning = false;
 
     public Machine(final Class<? extends Graphics> graphicsClass, final Class<? extends Sound> soundClass,
                    final Class<? extends Keyboard> keyboardClass) throws NoSuchMethodException, IllegalAccessException,
             InvocationTargetException, InstantiationException {
+        clock = new Clock(CLOCK_FREQUENCY, "ClockThread");
         memory = new Memory();
         graphics = graphicsClass.getConstructor(int.class, int.class, Memory.class).newInstance(64, 32, memory);
-        sound = soundClass.getConstructor().newInstance();
+        sound = soundClass.getConstructor(Clock.class).newInstance(clock);
+        timer = new Timer(clock);
         keyboard = keyboardClass.getConstructor().newInstance();
-        timer = new Timer();
         cpu = new Cpu(memory, graphics, sound, keyboard, timer);
     }
 
@@ -35,6 +39,7 @@ public class Machine {
         memory.reset();
         graphics.reset();
         sound.reset();
+        clock.stop();
     }
 
     public void loadProgram(final String fileName) throws IOException {
@@ -43,11 +48,13 @@ public class Machine {
     }
 
     public void start() {
+        clock.start();
         cpu.start();
         isRunning = true;
     }
 
     public void stop() {
+        clock.stop();
         cpu.stop();
         isRunning = false;
     }

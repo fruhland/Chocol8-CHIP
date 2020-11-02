@@ -2,15 +2,11 @@ package one.ruhland.chocol8.chip;
 
 public abstract class Sound {
 
-    private static final double FREQUENCY = 60;
     private static final double DEFAULT_TONE_FREQUENCY = 440;
 
-    private final Clock clock;
     private byte counter = 0;
-    private double toneFrequency = DEFAULT_TONE_FREQUENCY;
 
-    protected Sound() {
-        clock = new Clock(FREQUENCY, "SoundThread");
+    protected Sound(Clock clock) {
         clock.addRunnable(() -> {
             if (counter != 0) {
                 setCounter((byte) (counter - 1));
@@ -20,14 +16,6 @@ public abstract class Sound {
 
     void reset() {
         counter = 0;
-    }
-
-    void start() {
-        clock.start();
-    }
-
-    void stop() {
-        clock.stop();
     }
 
     public void setCounter(final byte counter) {

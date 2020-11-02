@@ -14,8 +14,8 @@ public class DefaultSound extends Sound {
     private double toneFrequency;
     private boolean isPlaying = false;
 
-    public DefaultSound() {
-        super();
+    public DefaultSound(Clock clock) {
+        super(clock);
         setToneFrequency(DEFAULT_FREQUENCY);
     }
 

@@ -4,11 +4,9 @@ public class Timer {
 
     private static final double FREQUENCY = 60;
 
-    private final Clock clock;
     private byte counter = 0;
 
-    Timer() {
-        clock = new Clock(FREQUENCY, "TimerThread");
+    Timer(Clock clock) {
         clock.addRunnable(() -> {
             if (counter != 0) {
                 counter--;
@@ -18,14 +16,6 @@ public class Timer {
 
     void reset() {
         counter = 0;
-    }
-
-    void start() {
-        clock.start();
-    }
-
-    void stop() {
-        clock.stop();
     }
 
     public void setCounter(final byte counter) {
