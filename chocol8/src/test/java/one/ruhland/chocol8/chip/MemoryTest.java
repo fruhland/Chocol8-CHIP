@@ -8,6 +8,21 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class MemoryTest {
 
     @Test
+    public void testConstructor() throws NoSuchFieldException, IllegalAccessException {
+        Field arrayField = Memory.class.getDeclaredField("memory");
+        arrayField.setAccessible(true);
+
+        Memory memory = new Memory();
+        byte[] array = (byte[]) arrayField.get(memory);
+
+        assertEquals(Memory.MEMORY_SIZE, array.length);
+
+        for (byte b : array) {
+            assertEquals(0, b);
+        }
+    }
+
+    @Test
     public void testSize() {
         Memory memory = new Memory();
 
@@ -102,15 +117,6 @@ public class MemoryTest {
 
         for (int i = 0; i < memory.getSize(); i++) {
             assertEquals((byte) i, memory.getByte(i));
-        }
-    }
-
-    @Test
-    public void testConstructor() {
-        Memory memory = new Memory();
-
-        for (int i = 0; i < memory.getSize(); i++) {
-            assertEquals(0, memory.getByte(i));
         }
     }
 

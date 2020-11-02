@@ -31,7 +31,7 @@ public class Cpu {
         this.timer = timer;
 
         clock = new Clock(DEFAULT_FREQUENCY, "CpuThread");
-        stack = new Stack((byte) 16);
+        stack = new Stack();
 
         clock.addRunnable(this::runCycle);
     }

@@ -2,19 +2,19 @@ package one.ruhland.chocol8.chip;
 
 public class Stack {
 
-    private short[] stack;
+    static final int STACK_SIZE = 0x10;
+
+    private short[] stack = new short[STACK_SIZE];
     private byte stackPointer = 0x00;
 
-    Stack(byte size) {
-        stack = new short[size];
-    }
+    Stack() {}
 
-    void push(final short address) {
+    void push(final short value) {
         if(stackPointer >= stack.length) {
             throw new IllegalStateException("Trying to push to full stack (Stack size: " + stack.length + ")!");
         }
 
-        stack[stackPointer++] = address;
+        stack[stackPointer++] = value;
     }
 
     short pop() {
