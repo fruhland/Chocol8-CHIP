@@ -17,7 +17,7 @@ class CpuControlPanel extends JPanel {
         this.machine = machine;
 
         stopButton.addActionListener((ActionEvent e) -> {
-            machine.getCpu().setProgramCounter((short) 0x0200);
+            machine.reset();
         });
 
         playPauseButton.addActionListener((ActionEvent e) -> {

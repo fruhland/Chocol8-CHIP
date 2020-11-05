@@ -15,7 +15,7 @@ class StackTable extends JTable {
         this.machine = machine;
 
         setModel(new StackTableModel());
-        setDefaultRenderer(String.class, new CellRenderer());
+        setDefaultRenderer(String.class, new StackCellRenderer());
     }
 
     private final class StackTableModel extends AbstractTableModel {
@@ -65,29 +65,6 @@ class StackTable extends JTable {
             }
 
             machine.getCpu().getStack().setAt(row, (short) Integer.parseInt(o.toString(), 16));
-        }
-    }
-
-    private static final class CellRenderer extends DefaultTableCellRenderer {
-
-        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int col) {
-            var ret = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, col);
-
-            if ((col == 0) && ret instanceof JLabel) {
-                var label = (JLabel) ret;
-
-                label.setFont(label.getFont().deriveFont(Font.BOLD));
-                label.setBorder(BorderFactory.createEtchedBorder());
-                label.setBackground(Color.LIGHT_GRAY);
-                label.setHorizontalAlignment(SwingConstants.CENTER);
-            } else if (ret instanceof JLabel) {
-                var label = (JLabel) ret;
-
-                label.setBackground(Color.WHITE);
-                label.setHorizontalAlignment(SwingConstants.RIGHT);
-            }
-
-            return ret;
         }
     }
 }
