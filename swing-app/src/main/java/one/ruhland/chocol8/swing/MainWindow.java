@@ -1,9 +1,12 @@
 package one.ruhland.chocol8.swing;
 
+import one.ruhland.chocol8.chip.Cpu;
 import one.ruhland.chocol8.chip.Machine;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.io.IOException;
@@ -31,6 +34,8 @@ public class MainWindow extends JFrame {
                     "of type " + machine.getGraphics().getClass().getCanonicalName() + "! " +
                     "This frontend only works with " + SwingGraphics.class.getCanonicalName() + "!");
         }
+
+        machine.getCpu().setCompatibilityMode(Cpu.CompatibilityMode.CHIP_8);
 
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setTitle(WINDOW_TITLE);
@@ -114,7 +119,43 @@ public class MainWindow extends JFrame {
             scaleMenu.add(item);
         }
 
+        var compatibilityMenu = new JMenu("Compatibility Mode");
+
+        var chip8Item = new JRadioButtonMenuItem("CHIP-8");
+        var superChipItem = new JRadioButtonMenuItem("S-CHIP");
+
+        chip8Item.addActionListener(actionEvent -> machine.getCpu().setCompatibilityMode(Cpu.CompatibilityMode.CHIP_8));
+        superChipItem.addActionListener(actionEvent -> machine.getCpu().setCompatibilityMode(Cpu.CompatibilityMode.SUPER_CHIP));
+
+        ButtonGroup compatibilityGroup = new ButtonGroup();
+        compatibilityGroup.add(chip8Item);
+        compatibilityGroup.add(superChipItem);
+
+        compatibilityMenu.add(chip8Item);
+        compatibilityMenu.add(superChipItem);
+
+        compatibilityMenu.addMenuListener(new MenuListener() {
+            @Override
+            public void menuSelected(MenuEvent menuEvent) {
+                switch (machine.getCpu().getCompatibilityMode()) {
+                    case CHIP_8:
+                        chip8Item.setSelected(true);
+                        break;
+                    case SUPER_CHIP:
+                        superChipItem.setSelected(true);
+                        break;
+                }
+            }
+
+            @Override
+            public void menuDeselected(MenuEvent menuEvent) {}
+
+            @Override
+            public void menuCanceled(MenuEvent menuEvent) {}
+        });
+
         optionsMenu.add(scaleMenu);
+        optionsMenu.add(compatibilityMenu);
 
         // Setup tools menu
         var memoryItem = new JMenuItem("Memory Inspector");

@@ -6,6 +6,10 @@ import java.util.function.Function;
 
 public class Cpu {
 
+    public enum CompatibilityMode {
+        CHIP_8, SUPER_CHIP
+    }
+
     private static final double DEFAULT_FREQUENCY = 1000;
 
     private final byte[] vRegisters = new byte[0x10];
@@ -13,6 +17,8 @@ public class Cpu {
     private short indexRegister = 0x0000;
 
     private Keyboard.Key currentKey = null;
+
+    private CompatibilityMode compatibilityMode = CompatibilityMode.CHIP_8;
 
     private final Memory memory;
     private final Graphics graphics;
@@ -58,6 +64,10 @@ public class Cpu {
         executeOpcode(opcode);
     }
 
+    public CompatibilityMode getCompatibilityMode() {
+        return compatibilityMode;
+    }
+
     public Clock getClock() {
         return clock;
     }
@@ -76,6 +86,10 @@ public class Cpu {
 
     public short getIndexRegister() {
         return indexRegister;
+    }
+
+    public void setCompatibilityMode(CompatibilityMode compatibilityMode) {
+        this.compatibilityMode = compatibilityMode;
     }
 
     public void setProgramCounter(short programCounter) {
@@ -149,7 +163,7 @@ public class Cpu {
                 break;
             case 0x2:
                 // 0x2NNN: Call subroutine at NNN
-                stack.push((programCounter));
+                stack.push(programCounter);
                 jumpToAddress((short) (opcode & 0x0fff));
                 break;
             case 0x3:
@@ -235,10 +249,17 @@ public class Cpu {
                     incProgramCounter();
                     break;
                 }
-                // 0x8XY6: V[X] = V[Y] >> 1; V[F] = LSB(V[Y])
+                // 0x8XY6: CHIP_8:      V[X] = V[Y] >> 1; V[F] = LSB(V[Y])
+                //         SUPER_CHIP:  V[X] = V[X] >> 1; V[F] = LSB(V[X])
                 else if ((opcode & 0x000f) == 0x6) {
-                    vRegisters[0xf] = (byte) (vRegisters[(opcode & 0x00f0) >> 4] & 0x01);
-                    vRegisters[(opcode & 0x0f00) >> 8] = (byte) (vRegisters[(opcode & 0x00f0) >> 4] >> 1);
+                    if (compatibilityMode == CompatibilityMode.CHIP_8) {
+                        vRegisters[0xf] = (byte) (vRegisters[(opcode & 0x00f0) >> 4] & 0x01);
+                        vRegisters[(opcode & 0x0f00) >> 8] = (byte) (vRegisters[(opcode & 0x00f0) >> 4] >> 1);
+                    } else if (compatibilityMode == CompatibilityMode.SUPER_CHIP) {
+                        vRegisters[0xf] = (byte) (vRegisters[(opcode & 0x0f00) >> 8] & 0x01);
+                        vRegisters[(opcode & 0x0f00) >> 8] = (byte) (vRegisters[(opcode & 0x0f00) >> 8] >> 1);
+                    }
+
                     incProgramCounter();
                     break;
                 }
@@ -253,10 +274,17 @@ public class Cpu {
                     incProgramCounter();
                     break;
                 }
-                // 0x8XYE: V[X] <<= 1; V[F] = MSB(V[X])
+                // 0x8XY$: CHIP_8:      V[X] = V[Y] << 1; V[F] = LSB(V[Y])
+                //         SUPER_CHIP:  V[X] = V[X] << 1; V[F] = LSB(V[X])
                 else if ((opcode & 0x000f) == 0xe) {
-                    vRegisters[0xf] = (byte) (vRegisters[(opcode & 0x00f0) >> 4] & 0x80);
-                    vRegisters[(opcode & 0x0f00) >> 8] = (byte) (vRegisters[(opcode & 0x00f0) >> 4] << 1);
+                    if (compatibilityMode == CompatibilityMode.CHIP_8) {
+                        vRegisters[0xf] = (byte) (vRegisters[(opcode & 0x00f0) >> 4] & 0x80);
+                        vRegisters[(opcode & 0x0f00) >> 8] = (byte) (vRegisters[(opcode & 0x00f0) >> 4] << 1);
+                    } else if (compatibilityMode == CompatibilityMode.SUPER_CHIP) {
+                        vRegisters[0xf] = (byte) (vRegisters[(opcode & 0x0f00) >> 8] & 0x80);
+                        vRegisters[(opcode & 0x0f00) >> 8] = (byte) (vRegisters[(opcode & 0x0f00) >> 8] << 1);
+                    }
+
                     incProgramCounter();
                     break;
                 } else {
@@ -359,15 +387,6 @@ public class Cpu {
                     incProgramCounter();
                     break;
                 }
-                // 0xfX55: Write registers V[0] to V[X] consecutively to memory at the address pointed to by the index register
-                else if ((opcode & 0x00ff) == 0x55) {
-                    for (int i = 0; i <= (opcode & 0x0f00) >> 8; i++) {
-                        memory.setByte(indexRegister + i, vRegisters[i]);
-                    }
-
-                    incProgramCounter();
-                    break;
-                }
                 // 0xfX33: Write BCD(V[X]) to memory at the address pointed to by the index register
                 else if ((opcode & 0x00ff) == 0x33) {
                     char[] digits = String.format("%03d", getUnsignedByte(vRegisters[(opcode & 0x0f00) >> 8])).toCharArray();
@@ -379,10 +398,33 @@ public class Cpu {
                     incProgramCounter();
                     break;
                 }
+                // 0xfX55: Write registers V[0] to V[X] consecutively to memory at the address pointed to by the index register
+                //         CHIP_8: Increase index register while writing
+                else if ((opcode & 0x00ff) == 0x55) {
+                    int count = (opcode & 0x0f00) >> 8;
+
+                    for (int i = 0; i <= count; i++) {
+                        memory.setByte(indexRegister + i, vRegisters[i]);
+                    }
+
+                    if (compatibilityMode == CompatibilityMode.CHIP_8) {
+                        indexRegister += count;
+                    }
+
+                    incProgramCounter();
+                    break;
+                }
                 // 0xfX65: Load registers V[0] to V[X] from memory at the address pointed to by the index register
+                //         CHIP_8: Increase index register while reading
                 else if ((opcode & 0x00ff) == 0x65) {
-                    for (int i = 0; i <= (opcode & 0x0f00) >> 8; i++) {
+                    int count = (opcode & 0x0f00) >> 8;
+
+                    for (int i = 0; i <= count; i++) {
                         vRegisters[i] = memory.getByte(indexRegister + i);
+                    }
+
+                    if (compatibilityMode == CompatibilityMode.CHIP_8) {
+                        indexRegister += count;
                     }
 
                     incProgramCounter();
