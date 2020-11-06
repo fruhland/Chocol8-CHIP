@@ -106,18 +106,35 @@ public class MainWindow extends JFrame {
 
         // Setup options menu
         var scaleMenu = new JMenu("Scale factor");
+        var scaleGroup = new ButtonGroup();
 
         for (int i = 1; i <= 16; i++) {
             final int factor = i;
 
-            var item = new JMenuItem(factor + "X");
+            var item = new JRadioButtonMenuItem(factor + "X");
             item.addActionListener(actionEvent -> {
                 graphicsPanel.setScaleFactor(factor);
                 pack();
             });
 
             scaleMenu.add(item);
+            scaleGroup.add(item);
         }
+
+        scaleMenu.addMenuListener(new MenuListener() {
+            @Override
+            public void menuSelected(MenuEvent menuEvent) {
+                if (graphicsPanel.getScaleFactor() <= scaleMenu.getItemCount()) {
+                    scaleMenu.getItem(graphicsPanel.getScaleFactor() - 1).setSelected(true);
+                }
+            }
+
+            @Override
+            public void menuDeselected(MenuEvent menuEvent) {}
+
+            @Override
+            public void menuCanceled(MenuEvent menuEvent) {}
+        });
 
         var compatibilityMenu = new JMenu("Compatibility Mode");
 

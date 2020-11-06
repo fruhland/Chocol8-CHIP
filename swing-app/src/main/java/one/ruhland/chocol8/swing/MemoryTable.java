@@ -3,9 +3,7 @@ package one.ruhland.chocol8.swing;
 import one.ruhland.chocol8.chip.Machine;
 
 import javax.swing.*;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
-import java.awt.*;
 
 class MemoryTable extends JTable {
 

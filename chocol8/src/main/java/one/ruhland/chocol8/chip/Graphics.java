@@ -4,18 +4,21 @@ import java.util.Arrays;
 
 public abstract class Graphics {
 
-    private final int resolutionX;
-    private final int resolutionY;
+    private int resolutionX;
+    private int resolutionY;
     private boolean[] frameBuffer;
 
     private final Memory memory;
 
     protected Graphics(final int resolutionX, final int resolutionY, final Memory memory) {
+        if (resolutionX < 1 || resolutionY < 1) {
+            throw new IllegalArgumentException("The resolution must be a positive number greater than zero!");
+        }
+
         this.resolutionX = resolutionX;
         this.resolutionY = resolutionY;
+        this.frameBuffer = new boolean[resolutionX * resolutionY];
         this.memory = memory;
-
-        frameBuffer = new boolean[resolutionX * resolutionY];
     }
 
     boolean drawSprite(final int x, final int y, final int height, final int address) {
@@ -38,23 +41,29 @@ public abstract class Graphics {
             }
         }
 
-        draw(Arrays.copyOf(frameBuffer, frameBuffer.length));
+        drawScreen(Arrays.copyOf(frameBuffer, frameBuffer.length));
 
         return flippedFromSetToUnset;
     }
 
-    protected int getResolutionX() {
-        return resolutionX;
-    }
-
-    protected int getResolutionY() {
-        return resolutionY;
-    }
-
     protected void reset() {
         Arrays.fill(frameBuffer, false);
-        draw(Arrays.copyOf(frameBuffer, frameBuffer.length));
+        drawScreen(Arrays.copyOf(frameBuffer, frameBuffer.length));
     }
 
-    protected abstract void draw(boolean[] screen);
+    protected void setResolution(final int resolutionX, final int resolutionY) {
+        if (resolutionX < 1 || resolutionY < 1) {
+            throw new IllegalArgumentException("The resolution must be a positive number greater than zero!");
+        }
+
+        this.resolutionX = resolutionX;
+        this.resolutionY = resolutionY;
+        this.frameBuffer = new boolean[resolutionX * resolutionY];
+
+        setDisplayResolution(resolutionX, resolutionY);
+    }
+
+    protected abstract void setDisplayResolution(final int resolutionX, final int resolutionY);
+
+    protected abstract void drawScreen(boolean[] screen);
 }

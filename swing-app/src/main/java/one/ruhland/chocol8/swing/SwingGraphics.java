@@ -22,14 +22,19 @@ public class SwingGraphics extends Graphics {
     }
 
     @Override
-    protected void draw(boolean[] frameBuffer) {
+    protected void setDisplayResolution(final int resolutionX, final int resolutionY) {
+        panel.setResolution(resolutionX, resolutionY);
+    }
+
+    @Override
+    protected void drawScreen(boolean[] frameBuffer) {
         panel.draw(frameBuffer);
     }
 
     static final class GraphicsPanel extends JPanel {
 
-        private final int resolutionX;
-        private final int resolutionY;
+        private int resolutionX;
+        private int resolutionY;
 
         private boolean[] frameBuffer;
 
@@ -43,6 +48,23 @@ public class SwingGraphics extends Graphics {
 
         public int getScaleFactor() {
             return scaleFactor;
+        }
+
+        void setResolution(final int resolutionX, final int resolutionY) {
+            if (resolutionX < 1 || resolutionY < 1) {
+                throw new IllegalArgumentException("The resolution must be a positive number greater than zero!");
+            }
+
+            this.resolutionX = resolutionX;
+            this.resolutionY = resolutionY;
+            frameBuffer = new boolean[resolutionX * resolutionY];
+
+            repaint();
+
+            var parent = getParent();
+            if (parent != null && getParent() instanceof JFrame) {
+                ((JFrame) getParent()).pack();
+            }
         }
 
         void setScaleFactor(int scaleFactor) {
@@ -68,10 +90,18 @@ public class SwingGraphics extends Graphics {
         protected void paintComponent(java.awt.Graphics g) {
             super.paintComponent(g);
 
+            g.setColor(Color.WHITE);
+            g.fillRect(0, 0, scaleFactor * resolutionX, scaleFactor * resolutionY);
+
+            g.setColor(Color.BLACK);
+
             for (int i = 0; i < resolutionX; i++) {
                 for (int j = 0; j < resolutionY; j++) {
-                    g.setColor(frameBuffer[i + j * resolutionX] ? Color.BLACK : Color.WHITE);
-                    g.fillRect(i * scaleFactor, j * scaleFactor, scaleFactor, scaleFactor);
+                    int index = i + j * resolutionX;
+
+                    if (index < frameBuffer.length && frameBuffer[index]) {
+                        g.fillRect(i * scaleFactor, j * scaleFactor, scaleFactor, scaleFactor);
+                    }
                 }
             }
         }
