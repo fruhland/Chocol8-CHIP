@@ -40,6 +40,8 @@ public class SwingGraphics extends Graphics {
 
         private int scaleFactor = 8;
 
+        private boolean inverted = false;
+
         GraphicsPanel(final int resolutionX, final int resolutionY) {
             this.resolutionX = resolutionX;
             this.resolutionY = resolutionY;
@@ -48,6 +50,24 @@ public class SwingGraphics extends Graphics {
 
         public int getScaleFactor() {
             return scaleFactor;
+        }
+
+        void setScaleFactor(int scaleFactor) {
+            if (scaleFactor < 1) {
+                throw new IllegalArgumentException("Scale factor must be at least 1!");
+            }
+
+            this.scaleFactor = scaleFactor;
+            repaint();
+        }
+
+        public boolean isInverted() {
+            return inverted;
+        }
+
+        public void invertColors() {
+            inverted = !inverted;
+            repaint();
         }
 
         void setResolution(final int resolutionX, final int resolutionY) {
@@ -67,15 +87,6 @@ public class SwingGraphics extends Graphics {
             }
         }
 
-        void setScaleFactor(int scaleFactor) {
-            if (scaleFactor < 1) {
-                throw new IllegalArgumentException("Scale factor must be at least 1!");
-            }
-
-            this.scaleFactor = scaleFactor;
-            repaint();
-        }
-
         void draw(boolean[] frameBuffer) {
             this.frameBuffer = frameBuffer;
             this.repaint();
@@ -90,10 +101,10 @@ public class SwingGraphics extends Graphics {
         protected void paintComponent(java.awt.Graphics g) {
             super.paintComponent(g);
 
-            g.setColor(Color.WHITE);
-            g.fillRect(0, 0, scaleFactor * resolutionX, scaleFactor * resolutionY);
+            g.setColor(inverted ? Color.BLACK : Color.WHITE);
+            g.fillRect(0, 0, resolutionX * scaleFactor, resolutionY * scaleFactor);
 
-            g.setColor(Color.BLACK);
+            g.setColor(inverted ? Color.WHITE : Color.BLACK);
 
             for (int i = 0; i < resolutionX; i++) {
                 for (int j = 0; j < resolutionY; j++) {

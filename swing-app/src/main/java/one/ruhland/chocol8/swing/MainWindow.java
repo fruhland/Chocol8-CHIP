@@ -144,7 +144,7 @@ public class MainWindow extends JFrame {
         chip8Item.addActionListener(actionEvent -> machine.getCpu().setCompatibilityMode(Cpu.CompatibilityMode.CHIP_8));
         superChipItem.addActionListener(actionEvent -> machine.getCpu().setCompatibilityMode(Cpu.CompatibilityMode.SUPER_CHIP));
 
-        ButtonGroup compatibilityGroup = new ButtonGroup();
+        var compatibilityGroup = new ButtonGroup();
         compatibilityGroup.add(chip8Item);
         compatibilityGroup.add(superChipItem);
 
@@ -171,8 +171,25 @@ public class MainWindow extends JFrame {
             public void menuCanceled(MenuEvent menuEvent) {}
         });
 
+        var invertColorsItem = new JCheckBoxMenuItem("Invert colors");
+        invertColorsItem.addActionListener(actionEvent -> graphicsPanel.invertColors());
+
         optionsMenu.add(scaleMenu);
         optionsMenu.add(compatibilityMenu);
+        optionsMenu.add(invertColorsItem);
+
+        optionsMenu.addMenuListener(new MenuListener() {
+            @Override
+            public void menuSelected(MenuEvent menuEvent) {
+                invertColorsItem.setState(graphicsPanel.isInverted());
+            }
+
+            @Override
+            public void menuDeselected(MenuEvent menuEvent) {}
+
+            @Override
+            public void menuCanceled(MenuEvent menuEvent) {}
+        });
 
         // Setup tools menu
         var memoryItem = new JMenuItem("Memory Inspector");
