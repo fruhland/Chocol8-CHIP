@@ -15,16 +15,16 @@ public class Clock {
     private boolean isRunning = false;
 
     Clock(final double frequency, final String threadName) {
+        if (frequency < 1) {
+            throw new IllegalArgumentException("The frequency must be positive number greater than zero!");
+        }
+
         this.frequency = frequency;
         this.threadName = threadName;
     }
 
     void addRunnable(Runnable runnable) {
         onTick.add(runnable);
-    }
-
-    void removeRunnable(Runnable runnable) {
-        onTick.remove(runnable);
     }
 
     void start() {
