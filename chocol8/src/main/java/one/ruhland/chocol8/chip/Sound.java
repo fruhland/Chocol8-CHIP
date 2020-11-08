@@ -2,8 +2,6 @@ package one.ruhland.chocol8.chip;
 
 public abstract class Sound {
 
-    private static final double DEFAULT_TONE_FREQUENCY = 440;
-
     private byte counter = 0;
 
     protected Sound(Clock clock) {

@@ -30,16 +30,17 @@ public class DefaultSound extends Sound {
 
         AudioFormat format = new AudioFormat(SAMPLE_RATE, SAMPLE_SIZE, 1, true, false);
 
-        try {
             byte[] audioArray = new byte[audioData.size()];
 
             for (int i = 0; i < audioArray.length; i++) {
                 audioArray[i] = audioData.get(i);
             }
 
+        try {
             clip = AudioSystem.getClip();
             clip.open(format, audioArray, 0, audioArray.length);
-        } catch (LineUnavailableException e) {
+        } catch (LineUnavailableException | IllegalArgumentException e) {
+            clip = null;
             e.printStackTrace();
         }
     }
@@ -51,7 +52,7 @@ public class DefaultSound extends Sound {
 
     @Override
     protected void startBeep() {
-        if (isPlaying) {
+        if (clip == null || isPlaying) {
             return;
         }
 
