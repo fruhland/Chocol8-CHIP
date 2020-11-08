@@ -1,3 +1,4 @@
+os: linux
 language: java
 dist: xenial
 
@@ -10,6 +11,7 @@ jobs:
       script:
         - ./gradlew check
         - ./gradlew chocol8:jar swing-app:distZip
+        - bash <(curl -s https://codecov.io/bash)
 
 before_deploy:
   - export CHOCOL8_JAR_FILE=$(ls build/chocol8/libs/*.jar)
@@ -17,11 +19,11 @@ before_deploy:
 
 deploy:
   provider: releases
-  api_key: ${ACCESS_TOKEN}
+  token: ${ACCESS_TOKEN}
   file:
     - ${RELEASE_JAR_FILE}
     - ${SWING_ZIP_FILE}
-  skip_cleanup: true
+  cleanup: false
   overwrite: true
   on:
     repo: faruh100/Chocol8-CHIP
