@@ -2,8 +2,6 @@ package one.ruhland.chocol8.chip;
 
 public class Timer {
 
-    private static final double FREQUENCY = 60;
-
     private byte counter = 0;
 
     Timer(Clock clock) {
