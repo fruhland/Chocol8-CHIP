@@ -4,8 +4,6 @@ import one.ruhland.chocol8.chip.Machine;
 
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableCellRenderer;
-import java.awt.*;
 
 class StackTable extends JTable {
 

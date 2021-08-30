@@ -5,8 +5,6 @@ import one.ruhland.chocol8.chip.Memory;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.Arrays;
-import java.util.concurrent.locks.LockSupport;
 
 public class SwingGraphics extends Graphics {
 

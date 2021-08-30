@@ -4,16 +4,21 @@ dist: xenial
 
 stages:
   - name: build
+  - name: release
+    if: tag IS present
 
 jobs:
   include:
     - stage: build
       script:
+        - ./gradlew build
         - ./gradlew check
-        - ./gradlew chocol8:jar swing-app:distZip
         - bash <(curl -s https://codecov.io/bash)
+    - stage: release
+      script: ./gradlew chocol8:shadowJar swing-app:distZip -Drelease=true
 
 before_deploy:
+  - rm build/chocol8/libs/*SNAPSHOT.jar
   - export CHOCOL8_JAR_FILE=$(ls build/chocol8/libs/*.jar)
   - export SWING_ZIP_FILE=$(ls build/swing-app/distributions/*.jar)
 

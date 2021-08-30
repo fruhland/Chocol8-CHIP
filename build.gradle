@@ -1,5 +1,5 @@
 ext {
-    projectVersion = '0.1.0'
+    projectVersion = '0.1.0' + (Boolean.valueOf(System.getProperty('release')) ? '' : '-SNAPSHOT')
 }
 
 buildscript {
@@ -17,5 +17,5 @@ subprojects {
 }
 
 wrapper {
-    gradleVersion = "6.7"
+    gradleVersion = "6.9.1"
 }
